@@ -1,15 +1,51 @@
 
 import React, { useState } from 'react';
 import { LogIn, Mail, Lock } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
-function Login() {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
 
-  const handleSubmit = (e) => {
+function Login(props) {
+  const [credentials, setCredentials] = useState({ email: "", password: "" });
+  let navigate = useNavigate();
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
     // Handle login logic here
+    const response = await fetch(`http://localhost:3000/api/v1/users/login`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      // used to send data to the api in json format
+      body: JSON.stringify({ email: credentials.email, password: credentials.password })
+    });
+    try {
+      const json = await response.json();
+    
+    // console.log('Response:', response);
+    // console.log("------------------")
+    // console.log('Response JSON:', json);
+
+    if (response.status === 200) {
+      // console.log('Access Token:', json.data.accessToken);
+      // console.log('Refresh Token:', json.data.refreshToken);
+      localStorage.setItem('accessToken', json.data.accessToken);
+      localStorage.setItem('refreshToken', json.data.refreshToken); // Store refresh token
+      props.showAlert("Login successfully", "success")
+      navigate("/");
+    }
+    else {
+      props.showAlert("Invalid credentials", "danger")
+    }
+  } catch (error) {
+    console.log("Invalid")
+    props.showAlert("Invalid credentials", "danger")
+  }
   };
+
+  const onChange = (e) => {
+    setCredentials({ ...credentials, [e.target.name]: e.target.value });
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
@@ -32,9 +68,11 @@ function Login() {
                 <Mail className="h-5 w-5 text-gray-400" />
               </div>
               <input
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                type="text"
+                name='email'
+                id="email"
+                value={credentials.email}
+                onChange={onChange}
                 className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
                 placeholder="you@example.com"
                 required
@@ -52,8 +90,10 @@ function Login() {
               </div>
               <input
                 type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                name='password'
+                id="password"
+                value={credentials.password}
+                onChange={onChange}
                 className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
                 placeholder="••••••••"
                 required

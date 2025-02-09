@@ -1,19 +1,47 @@
-
-
-
-
+import { useNavigate } from 'react-router-dom';
 import React, { useState } from 'react';
 import { UserPlus, Mail, Lock, User } from 'lucide-react';
 
-function Register() {
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+function Register(props) {
+  const [credentials, setCredentials] = useState({ name: "", email: "", password: "", username: "" });
+    let navigate = useNavigate();
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     // Handle registration logic here
+  //   if(credentials.password!==credentials.cpassword){
+  //     alert("Password and confirm doesn't match");
+  //     return
+  // }
+
+  // you can use this method too
+  // const { name, email, password, cpassword } = credentials;
+  const response = await fetch(`http://localhost:3000/api/v1/users/register`, {
+      method: 'POST',
+      headers: {
+          'Content-Type': 'application/json'
+      },
+      // used to send data to the api in json format
+      body: JSON.stringify({ fullname: credentials.name, email: credentials.email, password: credentials.password, username: credentials.username })
+  });
+  console.log(response)
+  console.log(response.status)
+  const json = await response.json();
+  // console
+
+  if (response.status === 201) {
+      // localStorage.setItem('token', json.authToken);
+      navigate("/login");
+      props.showAlert("Account created successfully","success")
+  }
+  else {
+      props.showAlert("Invalid credentials","danger")
+  }
   };
+
+  const onChange = (e) => {
+    setCredentials({ ...credentials, [e.target.name]: e.target.value });
+}
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
@@ -37,8 +65,10 @@ function Register() {
               </div>
               <input
                 type="text"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
+                name='name' 
+                id="name"
+                value={credentials.name}
+                onChange={onChange}
                 className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
                 placeholder="John Doe"
                 required
@@ -56,8 +86,10 @@ function Register() {
               </div>
               <input
                 type="text"
-                value={name}
-                onChange={(e) => setPassword(e.target.value)}
+                name='username' 
+                id="username"
+                value={credentials.username}
+                onChange={onChange}
                 className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
                 placeholder="john_doe"
                 required
@@ -75,10 +107,13 @@ function Register() {
               </div>
               <input
                 type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                name='email' 
+                id="email"
+                value={credentials.email}
+                onChange={onChange}
                 className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
                 placeholder="you@example.com"
+                autoComplete="email"
                 required
               />
             </div>
@@ -94,10 +129,13 @@ function Register() {
               </div>
               <input
                 type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                name='password'
+                id='password'
+                value={credentials.password}
+                onChange={onChange}
                 className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
                 placeholder="••••••••"
+                autoComplete="current-password"
                 required
               />
             </div>
