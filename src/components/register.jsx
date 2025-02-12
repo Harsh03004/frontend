@@ -1,10 +1,12 @@
-import { useNavigate } from 'react-router-dom';
+// import { useNavigate } from 'react-router-dom';
 import React, { useState } from 'react';
 import { UserPlus, Mail, Lock, User } from 'lucide-react';
+import userContext from '../context/user/userContext';
+
 
 function Register(props) {
   const [credentials, setCredentials] = useState({ name: "", email: "", password: "", username: "" });
-    let navigate = useNavigate();
+    // let navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -16,27 +18,7 @@ function Register(props) {
 
   // you can use this method too
   // const { name, email, password, cpassword } = credentials;
-  const response = await fetch(`http://localhost:3000/api/v1/users/register`, {
-      method: 'POST',
-      headers: {
-          'Content-Type': 'application/json'
-      },
-      // used to send data to the api in json format
-      body: JSON.stringify({ fullname: credentials.name, email: credentials.email, password: credentials.password, username: credentials.username })
-  });
-  console.log(response)
-  console.log(response.status)
-  const json = await response.json();
-  // console
-
-  if (response.status === 201) {
-      // localStorage.setItem('token', json.authToken);
-      navigate("/login");
-      props.showAlert("Account created successfully","success")
-  }
-  else {
-      props.showAlert("Invalid credentials","danger")
-  }
+  
   };
 
   const onChange = (e) => {
