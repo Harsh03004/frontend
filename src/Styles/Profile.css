@@ -1,4 +1,4 @@
-body {
+/* body {
     margin: 0;
     font-family: Arial, sans-serif;
     display: flex;
@@ -6,7 +6,7 @@ body {
     align-items: center;
     height: 100vh;
     background: linear-gradient(to right, #4facfe, #6a85b6);
-  }
+  } */
   
   .profile-container {
     width: 1000px; /* Increased size from 800px to 1000px */
