@@ -1,46 +1,22 @@
 
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { LogIn, Mail, Lock } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+// import { useNavigate } from 'react-router-dom';
+import userContext from '../context/user/userContext';
 
 
 function Login(props) {
+
+  const { loginUser } = useContext(userContext);
+
   const [credentials, setCredentials] = useState({ email: "", password: "" });
-  let navigate = useNavigate();
+  // let navigate = useNavigate();
+
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     // Handle login logic here
-    const response = await fetch(`http://localhost:3000/api/v1/users/login`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      // used to send data to the api in json format
-      body: JSON.stringify({ email: credentials.email, password: credentials.password })
-    });
-    try {
-      const json = await response.json();
-    
-    // console.log('Response:', response);
-    // console.log("------------------")
-    // console.log('Response JSON:', json);
-
-    if (response.status === 200) {
-      // console.log('Access Token:', json.data.accessToken);
-      // console.log('Refresh Token:', json.data.refreshToken);
-      localStorage.setItem('accessToken', json.data.accessToken);
-      localStorage.setItem('refreshToken', json.data.refreshToken); // Store refresh token
-      props.showAlert("Login successfully", "success")
-      navigate("/");
-    }
-    else {
-      props.showAlert("Invalid credentials", "danger")
-    }
-  } catch (error) {
-    console.log("Invalid")
-    props.showAlert("Invalid credentials", "danger")
-  }
+    await loginUser(credentials);
   };
 
   const onChange = (e) => {

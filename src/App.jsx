@@ -4,9 +4,12 @@ import Login from "./components/login";
 import Register from "./components/register";
 import Profile from "./pages/Profile";
 import Alert from "./components/Alert";
+import UserState from "./context/user/UserState";
 
 function App() {
 
+
+  const [userId, setUserId] = useState("");
 
   const [alert, setAlert] = useState(null);
   const showAlert = (msg, type) => {
@@ -20,17 +23,21 @@ function App() {
   }
 
   return (
-    <Router>
-      <Alert alert={alert} />
-      <div className="container">
-        <Routes>
-          {/* add the route to / to landing page when its built */}
-          <Route exact path="/" element={<Profile showAlert={showAlert} />} />
-          <Route exact path="/login" element={<Login showAlert={showAlert} />} />
-          <Route exact path="/register" element={<Register showAlert={showAlert} />} />
-        </Routes>
-      </div>
-    </Router>
+    <>
+      <Router>
+        <UserState showAlert={showAlert}>
+          <Alert alert={alert} />
+          <div className="container">
+            <Routes>
+              {/* add the route to / to landing page when its built */}
+              <Route exact path="/" element={<Profile showAlert={showAlert} />} />
+              <Route exact path="/login" element={<Login showAlert={showAlert} />} />
+              <Route exact path="/register" element={<Register showAlert={showAlert} />} />
+            </Routes>
+          </div>
+        </UserState>
+      </Router>
+    </>
   );
 }
 

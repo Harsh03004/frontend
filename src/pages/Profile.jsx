@@ -1,94 +1,117 @@
 import React, { useContext, useEffect, useRef, useState } from "react";
 import { useNavigate } from 'react-router-dom';
 import "../Styles/Profile.css";
+import userContext from '../context/user/userContext';
+
 
 const Profile = () => {
+
+  const { id, updateAvatar, checkRefreshToken, userDetail } = useContext(userContext);
+
 
   let navigate = useNavigate();
   const checkAndRefreshToken = async () => {
     const accessToken = localStorage.getItem('accessToken');
-    if (accessToken && accessToken!==undefined) {
+    if (accessToken && accessToken !== undefined) {
+      userDetail();
       return;
     }
-    try {
-      const response = await fetch(`http://localhost:3000/api/v1/users/refreshToken`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ refreshToken: localStorage.getItem('refreshToken') })
-      });
-      console.log('Response:', response);
-        console.log("------------------")
-      if (response.status === 200) {
-        const json = await response.json();
-        
-        console.log('Response JSON:', json);
-        console.log("------------------")
-        console.log("access token= "+json.data.accessToken);
-        if(json.data.accessToken===undefined){
-          navigate("/login");
-          return;
-        }
-        localStorage.setItem('accessToken', json.data.accessToken);
-        localStorage.setItem('refreshToken', json.data.refreshToken);
-        return;
-      } else {
-        navigate("/login");
-      }
-      
-    } catch (error) {
-      console.log(error);
-      navigate("/login");
-    }
+    checkRefreshToken();
   };
-    // work like documentdidmount
-    useEffect(() => {
-      checkAndRefreshToken();
-        // eslint-disable-next-line
-    }, [])
+  // work like documentdidmount
+  useEffect(() => {
+    checkAndRefreshToken();
+
+    // eslint-disable-next-line
+  }, [])
 
 
 
-  const [profileImage, setProfileImage] = useState("");
+  const [profileImage, setProfileImage] = useState(id.avatar);
+  useEffect(() => {
+    console.log("Updating profileImage:", id.avatar);
+    setProfileImage(id.avatar);
+  }, [id.avatar]);
 
-  const handleImageUpload = (event) => {
+
+  // not working fine need to work on it
+  // const handleImageUpload = async (event) => {
+  //   console.log(event.target.files)
+  //   const file = event.target.files[0];
+  //   if (file) {
+  //     const reader = new FileReader();
+  //     reader.onload = (e) => setProfileImage(e.target.result);
+  //     reader.readAsDataURL(file);
+  //     console.log(file)
+  //     const json = await updateAvatar(file);
+  //     // console.log("res")
+  //     // console.log(response)
+  //     // console.log(response.data);
+
+  //     if (response.data.avatar) {
+  //     //   console.log("response data")
+  //     //   console.log(response.data);
+  //       setProfileImage(response.data.avatar);
+  //     }
+  //     // setProfileImage(id.avatar)
+  //   }
+  // };
+
+  const handleImageUpload = async (event) => {
+    console.log(event.target.files);
     const file = event.target.files[0];
     if (file) {
       const reader = new FileReader();
       reader.onload = (e) => setProfileImage(e.target.result);
       reader.readAsDataURL(file);
+      console.log(file);
+
+      const response = await updateAvatar(file);
+      console.log("Response:", response);
+
+      if (response?.data?.avatar) {
+        console.log("Updated Avatar URL:", response.data.avatar);
+        setProfileImage(response.data.avatar);
+      }
     }
   };
 
+
   return (
-    <div className="profile-container">
-      <h1 className="profile-title">Profile</h1>
-      <div className="profile-card">
-        <div className="profile-image-container">
-          {profileImage ? (
-            <img src={profileImage} alt="Profile" className="profile-image" />
-          ) : (
-            <div className="placeholder-image">No Image</div>
-          )}
+    <>
+      <div className="dis">
+
+
+        <div className="profile-container">
+          <h1 className="profile-title">Profile</h1>
+          <div className="profile-card">
+            <div className="profile-image-container">
+              {profileImage ? (
+                <img src={profileImage} alt="Profile" className="profile-image" />
+                // <img src={profileImage? profileImage:""} alt="Profile" className="profile-image" />
+              ) : (
+                <div className="placeholder-image">No Image</div>
+              )}
+            </div>
+            <label htmlFor="file-upload" className="file-upload-label">
+              Upload Profile Picture
+            </label>
+            <input
+              type="file"
+              id="file-upload"
+              className="file-upload"
+              accept="image/*"
+              onChange={handleImageUpload}
+            />
+          </div>
+          <div className="profile-info">
+            <p>Full Name: <span>{id?.fullname}</span></p>
+            <p>Username: <span>{id?.username}</span></p>
+            <p>Email: <span>{id?.email}</span></p>
+          </div>
         </div>
-        <label htmlFor="file-upload" className="file-upload-label">
-          Upload Profile Picture
-        </label>
-        <input
-          type="file"
-          id="file-upload"
-          className="file-upload"
-          accept="image/*"
-          onChange={handleImageUpload}
-        />
       </div>
-      <div className="profile-info">
-        <p>Full Name: <span>John Doe</span></p>
-        <p>Username: <span>johndoe123</span></p>
-        <p>Email: <span>johndoe@example.com</span></p>
-      </div>
-    </div>
+    </>
   );
 };
 
