@@ -18,10 +18,15 @@ const Profile = () => {
     }
     checkRefreshToken();
   };
+
+
+  const hasRun = useRef(false);
   // work like documentdidmount
   useEffect(() => {
+    if (!hasRun.current) {
+      hasRun.current = true;
     checkAndRefreshToken();
-
+    }
     // eslint-disable-next-line
   }, [])
 

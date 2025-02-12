@@ -8,6 +8,12 @@
     background: linear-gradient(to right, #4facfe, #6a85b6);
   } */
   
+.dis{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
   .profile-container {
     width: 1000px; /* Increased size from 800px to 1000px */
     padding: 20px;
