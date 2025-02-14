@@ -32,7 +32,7 @@ const Profile = () => {
 
 
 
-  const [profileImage, setProfileImage] = useState(id.avatar);
+  const [profileImage, setProfileImage] = useState(id?.avatar);
   useEffect(() => {
     console.log("Updating profileImage:", id.avatar);
     setProfileImage(id.avatar);

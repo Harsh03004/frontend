@@ -1,5 +1,5 @@
 // import { useNavigate } from 'react-router-dom';
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { UserPlus, Mail, Lock, User } from 'lucide-react';
 import userContext from '../context/user/userContext';
 
@@ -8,8 +8,12 @@ function Register(props) {
   const [credentials, setCredentials] = useState({ name: "", email: "", password: "", username: "" });
     // let navigate = useNavigate();
 
+  const { registerUser } = useContext(userContext);
+
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+    registerUser(credentials)
     // Handle registration logic here
   //   if(credentials.password!==credentials.cpassword){
   //     alert("Password and confirm doesn't match");
