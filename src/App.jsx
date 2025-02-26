@@ -5,6 +5,7 @@ import Register from "./components/register";
 import Profile from "./pages/Profile";
 import Alert from "./components/Alert";
 import UserState from "./context/user/UserState";
+import ForgotPassword from "./components/ForgotPassword"
 
 function App() {
 
@@ -33,6 +34,7 @@ function App() {
               <Route exact path="/" element={<Profile showAlert={showAlert} />} />
               <Route exact path="/login" element={<Login showAlert={showAlert} />} />
               <Route exact path="/register" element={<Register showAlert={showAlert} />} />
+              <Route exact path="/forgotPassword" element={<ForgotPassword showAlert={showAlert} />} />
             </Routes>
           </div>
         </UserState>
