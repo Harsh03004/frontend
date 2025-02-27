@@ -78,7 +78,7 @@ function Login(props) {
           </div>
 
           <div className="flex items-center justify-between">
-            <a href="#" className="text-sm font-medium text-indigo-600 hover:text-indigo-500 margin-right-2">
+            <a href="/forgotPassword" className="text-sm font-medium text-indigo-600 hover:text-indigo-500 margin-right-2">
               Forgot password?
             </a>
           </div>
