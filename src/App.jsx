@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import React, { useState } from 'react';
 import Login from "./components/login";
 import Register from "./components/register";
@@ -7,6 +7,7 @@ import Alert from "./components/Alert";
 import UserState from "./context/user/UserState";
 import ForgotPassword from "./components/ForgotPassword"
 import Landing from "./components/Landing";
+import { Navigation } from "lucide-react";
 function App() {
 
 
@@ -31,7 +32,7 @@ function App() {
           <div className="">
             <Routes>
               {/* add the route to / to landing page when its built */}
-              <Route exact path="/" element={<Profile showAlert={showAlert} />} />
+              <Route exact path="/" element={<Navigate to="/landing" />} />
               <Route exact path="/login" element={<Login showAlert={showAlert} />} />
               <Route exact path="/register" element={<Register showAlert={showAlert} />} />
               <Route exact path="/forgotPassword" element={<ForgotPassword showAlert={showAlert} />} />
