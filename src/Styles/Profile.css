@@ -14,8 +14,8 @@
   align-items: center;
 }
 
-  .profile-container {
-    width: 1000px; /* Increased size from 800px to 1000px */
+ .profile-container {
+    width: 1000px; 
     padding: 20px;
     background-color: #fff;
     border-radius: 15px;

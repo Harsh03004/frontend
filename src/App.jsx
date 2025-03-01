@@ -6,7 +6,7 @@ import Profile from "./pages/Profile";
 import Alert from "./components/Alert";
 import UserState from "./context/user/UserState";
 import ForgotPassword from "./components/ForgotPassword"
-
+import Landing from "./components/Landing";
 function App() {
 
 
@@ -28,13 +28,14 @@ function App() {
       <Router>
         <UserState showAlert={showAlert}>
           <Alert alert={alert} />
-          <div className="container">
+          <div className="">
             <Routes>
               {/* add the route to / to landing page when its built */}
               <Route exact path="/" element={<Profile showAlert={showAlert} />} />
               <Route exact path="/login" element={<Login showAlert={showAlert} />} />
               <Route exact path="/register" element={<Register showAlert={showAlert} />} />
               <Route exact path="/forgotPassword" element={<ForgotPassword showAlert={showAlert} />} />
+              <Route exact path="/landing" element={<Landing showAlert={showAlert} />} />
             </Routes>
           </div>
         </UserState>
