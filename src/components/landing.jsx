@@ -36,16 +36,18 @@ function Landing() {
               Experience crystal-clear video meetings, real-time collaboration, and secure communication all in one powerful platform.
             </p>
             <div className="flex gap-4">
-              <button className="px-8 py-4 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition flex items-center gap-2">
-                Get Started Free <ArrowRight size={20} />
-              </button>
+              <a href="https://samplestumeet.netlify.app/lobby.html" target='_blank'>
+                <button className="px-8 py-4 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition flex items-center gap-2">
+                  Get Started Instant Meeting <ArrowRight size={20} />
+                </button>
+              </a>
               <button className="px-8 py-4 border-2 border-gray-300 text-gray-700 rounded-lg font-semibold hover:border-gray-400 transition">
                 View Demo
               </button>
             </div>
           </div>
           <div className="md:w-1/2">
-            <img 
+            <img
               src="https://images.unsplash.com/photo-1515378960530-7c0da6231fb1?auto=format&fit=crop&q=80&w=1740"
               alt="Team meeting"
               className="rounded-2xl shadow-2xl"
@@ -59,22 +61,22 @@ function Landing() {
         <div className="container mx-auto px-6">
           <h2 className="text-3xl md:text-4xl font-bold text-center mb-16">Why Choose Our Platform?</h2>
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-            <FeatureCard 
+            <FeatureCard
               icon={<Video className="text-blue-600" size={32} />}
               title="HD Video Calls"
               description="Crystal clear video and audio quality for seamless communication"
             />
-            <FeatureCard 
+            <FeatureCard
               icon={<Users className="text-blue-600" size={32} />}
               title="Team Collaboration"
               description="Built-in tools for effective team collaboration and productivity"
             />
-            <FeatureCard 
+            <FeatureCard
               icon={<Shield className="text-blue-600" size={32} />}
               title="Enterprise Security"
               description="End-to-end encryption and advanced security features"
             />
-            <FeatureCard 
+            <FeatureCard
               icon={<Calendar className="text-blue-600" size={32} />}
               title="Smart Scheduling"
               description="Intelligent calendar integration and meeting management"
