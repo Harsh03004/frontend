@@ -16,7 +16,7 @@ const Navbar = () => {
         
         {/* Navigation Links */}
         <div className="flex items-center space-x-6">
-          <Link to="/" className="text-gray-700 hover:text-blue-500 transition-colors">Home</Link>
+          <Link to="/home" className="text-gray-700 hover:text-blue-500 transition-colors">Home</Link>
           {id ? (
             <div className="flex items-center space-x-4">
               <span className="flex items-center text-gray-700"><FaUserCircle className="mr-2" /> {id.username}</span>
