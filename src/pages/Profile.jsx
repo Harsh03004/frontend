@@ -2,10 +2,9 @@ import React, { useContext, useEffect, useRef, useState } from "react";
 import { useNavigate } from 'react-router-dom';
 import "../Styles/Profile.css";
 import userContext from '../context/user/userContext';
+import Navbar from "../components/navbar";
 
-
-const Profile = () => {
-
+function Profile() {
   const { id, updateAvatar, checkRefreshToken, userDetail } = useContext(userContext);
 
 
@@ -25,10 +24,10 @@ const Profile = () => {
   useEffect(() => {
     if (!hasRun.current) {
       hasRun.current = true;
-    checkAndRefreshToken();
+      checkAndRefreshToken();
     }
     // eslint-disable-next-line
-  }, [])
+  }, []);
 
 
 
@@ -52,7 +51,6 @@ const Profile = () => {
   //     // console.log("res")
   //     // console.log(response)
   //     // console.log(response.data);
-
   //     if (response.data.avatar) {
   //     //   console.log("response data")
   //     //   console.log(response.data);
@@ -61,7 +59,6 @@ const Profile = () => {
   //     // setProfileImage(id.avatar)
   //   }
   // };
-
   const handleImageUpload = async (event) => {
     console.log(event.target.files);
     const file = event.target.files[0];
@@ -84,9 +81,8 @@ const Profile = () => {
 
   return (
     <>
+      <Navbar />
       <div className="dis">
-
-
         <div className="profile-container">
           <h1 className="profile-title">Profile</h1>
           <div className="profile-card">
@@ -106,8 +102,7 @@ const Profile = () => {
               id="file-upload"
               className="file-upload"
               accept="image/*"
-              onChange={handleImageUpload}
-            />
+              onChange={handleImageUpload} />
           </div>
           <div className="profile-info">
             <p>Full Name: <span>{id?.fullname}</span></p>
@@ -118,6 +113,6 @@ const Profile = () => {
       </div>
     </>
   );
-};
+}
 
 export default Profile;

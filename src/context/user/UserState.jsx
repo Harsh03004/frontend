@@ -4,7 +4,6 @@ import userContext from './userContext';
 import { data, useNavigate } from 'react-router-dom';
 import Alert from '../../components/Alert';
 
-
 const UserState = (props) => {
 
     let navigate = useNavigate();
@@ -165,10 +164,15 @@ const UserState = (props) => {
           }
     }
 
-
+    const logout = async() => {
+        localStorage.removeItem('accessToken');
+        localStorage.removeItem('refreshToken');
+        navigate("/login");
+      };
+    
     // userDetail();
     return (
-        <userContext.Provider value={{ loginUser, registerUser, userDetail, updateAvatar, checkRefreshToken, id }}>
+        <userContext.Provider value={{ loginUser, registerUser, userDetail, updateAvatar, checkRefreshToken, logout, id }}>
             {props.children}
         </userContext.Provider>
     )
