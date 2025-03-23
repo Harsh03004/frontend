@@ -7,7 +7,6 @@ import Alert from "./components/Alert";
 import UserState from "./context/user/UserState";
 import ForgotPassword from "./components/ForgotPassword"
 import Landing from "./components/landing";
-
 import { Navigation } from "lucide-react";
 function App() {
 
