@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import Login from "./components/login";
 import Register from "./components/register";
 import Profile from "./pages/Profile";
+import Chat from "./components/chat";
 import HomePage from "./pages/HomePage";
 import Alert from "./components/Alert";
 import UserState from "./context/user/UserState";
@@ -39,6 +40,7 @@ function App() {
               <Route exact path="/register" element={<Register showAlert={showAlert} />} />
               <Route exact path="/forgotPassword" element={<ForgotPassword showAlert={showAlert} />} />
               <Route exact path="/" element={<Landing showAlert={showAlert} />} />
+              <Route exact path="/chat" element={<Chat />} />
             </Routes>
           </div>
         </UserState>
