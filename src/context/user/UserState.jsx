@@ -37,7 +37,7 @@ const UserState = (props) => {
                 // setId(json.data.user)
 
                 props.showAlert("Login successfully", "success")
-                navigate("/profile");
+                navigate("/home");
             }
             else {
                 props.showAlert("Invalid credentials", "danger")

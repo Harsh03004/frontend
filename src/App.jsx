@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import Login from "./components/login";
 import Register from "./components/register";
 import Profile from "./pages/Profile";
+import HomePage from "./pages/HomePage";
 import Alert from "./components/Alert";
 import UserState from "./context/user/UserState";
 import ForgotPassword from "./components/ForgotPassword"
@@ -32,6 +33,7 @@ function App() {
           <div className="">
             <Routes>
               {/* add the route to / to landing page when its built */}
+              <Route exact path="/home" element={<HomePage />} />
               <Route exact path="/profile" element={<Profile showAlert={showAlert} />} />
               <Route exact path="/login" element={<Login showAlert={showAlert} />} />
               <Route exact path="/register" element={<Register showAlert={showAlert} />} />
