@@ -163,7 +163,7 @@ const UserState = (props) => {
             navigate("/login");
           }
     }
-
+    // to be edited by kavya (this will be handled by the backend)
     const logout = async() => {
         localStorage.removeItem('accessToken');
         localStorage.removeItem('refreshToken');

@@ -8,14 +8,8 @@ const ChatSidebar = ({ users = [], setSelectedUser }) => {
       initial={{ x: -200, opacity: 0 }} 
       animate={{ x: 0, opacity: 1 }} 
       transition={{ duration: 0.5 }}
-      className="h-screen bg-gradient-to-b from-gray-900 to-gray-800 text-white w-64 py-8 px-4 flex flex-col shadow-lg overflow-y-auto"
+      className="h-screen bg-gradient-to-b from-gray-900 to-gray-800 text-white w-64 py-1 px-4 flex flex-col shadow-lg overflow-y-auto"
     >
-      <div className="text-3xl font-bold text-center mb-8 ">
-      <Link to="/" className="hover:text-green-400 transition-colors">Stumeet</Link>
-      </div>
-      <div className="text-2xl   mb-8  ">
-      <Link to="/home" className="flex items-center  px-4 rounded-lg">Home</Link>
-      </div>
       <nav className="flex flex-col space-y-2">
         {users.length > 0 ? (
           users.map((user) => (
