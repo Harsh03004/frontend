@@ -45,12 +45,12 @@ body {
   margin-bottom: 20px;
 }
 
-.profile-image {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
+.profile-img {
+  border: 4px solid;
+  border-image: linear-gradient(135deg, #7f5af0, #2cb67d) 1;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
 }
+
 
 .placeholder-image {
   width: 100%;
@@ -97,3 +97,4 @@ body {
   font-weight: 600;
   color: #111827;
 }
+

@@ -1,0 +1,78 @@
+.navbar {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    background: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  }
+  
+  .navbar .container {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 12px 32px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .brand {
+    font-size: 22px;
+    font-weight: 700;
+    color: #2563eb;
+    text-decoration: none;
+    transition: all 0.3s ease;
+  }
+  
+  .brand:hover {
+    color: #1d4ed8;
+    transform: scale(1.05);
+  }
+  
+  .nav-right {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    font-weight: 500;
+    font-size: 16px;
+    color: #1f2937;
+  }
+  
+  .user-icon {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: #1f2937;
+  }
+  
+  .logout-btn {
+    background-color: #ef4444;
+    color: #ffffff;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 9999px;
+    font-size: 16px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+  }
+  
+  .logout-btn:hover {
+    background-color: #dc2626;
+    transform: translateY(-2px);
+  }
+  
+  .logout-btn:active {
+    transform: scale(0.98);
+  }
+  
+  .login-btn {
+    background-color: #3b82f6;
+  }
+  
+  .login-btn:hover {
+    background-color: #2563eb;
+  }
+  
