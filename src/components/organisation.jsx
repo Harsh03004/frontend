@@ -22,7 +22,7 @@ const Organisation = () => {
       }
 
       try {
-        const response = await fetch("http://localhost:3000/api/v1/users/organizations", {
+        const response = await fetch("http://localhost:3000/api/v1/organisation/getOrganizations", {
           method: "POST",
           headers: {
             Authorization: `Bearer ${accessToken}`,
@@ -59,7 +59,7 @@ const Organisation = () => {
     }
 
     try {
-      const response = await fetch("http://localhost:3000/api/v1/users/createOrganization", {
+      const response = await fetch("http://localhost:3000/api/v1/organisation/createOrganization", {
         method: "POST",
         headers: {
           Authorization: `Bearer ${accessToken}`,
