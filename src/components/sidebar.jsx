@@ -1,64 +1,42 @@
-// import { Link } from 'react-router-dom';
-// import React from 'react';
-// import { motion } from 'framer-motion';
-
-// const Sidebar = () => {
-//   return (
-//     <motion.div 
-//       initial={{ x: -200, opacity: 0 }} 
-//       animate={{ x: 0, opacity: 1 }} 
-//       transition={{ duration: 0.5 }}
-//       className="h-screen bg-gradient-to-b from-gray-900 to-gray-800 text-white w-64 py-8 px-4 flex flex-col shadow-lg"
-//     >
-//       <div className="text-3xl font-bold text-center mb-8">
-//         <Link to="/" className="hover:text-green-400 transition-colors">Stumeet</Link>
-//       </div>
-//       <nav className="flex flex-col space-y-2">
-//         {['Chat', 'Instant Meet', 'Profile', 'Organisations'].map((item) => (
-//           <Link 
-//             key={item} 
-//             to={`/${item.toLowerCase().replace(' ', '-')}`} 
-//             className="flex items-center space-x-3 py-3 px-4 rounded-lg transition-transform duration-200 hover:bg-green-500 hover:scale-105"
-//           >
-//             <span className="text-lg">{item}</span>
-//           </Link>
-//         ))}
-//       </nav>
-//     </motion.div>
-//   );
-// };
-
-// export default Sidebar;
-
-
-
 import { Link } from 'react-router-dom';
-import React from 'react';
-import { motion } from 'framer-motion';
+import React, { useState } from 'react';
+import '../Styles/Sidebar.css';
+import { MessageCircle, Video, User, Building2, ChevronLeft, ChevronRight } from 'lucide-react';
+
+const menuItems = [
+  { name: 'Chat', icon: <MessageCircle size={18} /> },
+  { name: 'Instant Meet', icon: <Video size={18} /> },
+  { name: 'Profile', icon: <User size={18} /> },
+  { name: 'Organisations', icon: <Building2 size={18} /> },
+];
 
 const Sidebar = ({ setActivePage }) => {
+  const [collapsed, setCollapsed] = useState(false);
+
   return (
-    <motion.div 
-      initial={{ x: -200, opacity: 0 }} 
-      animate={{ x: 0, opacity: 1 }} 
-      transition={{ duration: 0.5 }}
-      className="h-screen bg-gradient-to-b from-gray-900 to-gray-800 text-white w-64 py-8 px-4 flex flex-col shadow-lg"
-    >
-      <div className="text-3xl font-bold text-center mb-8">
-        <Link to="/" className="hover:text-green-400 transition-colors">Stumeet</Link>
+    <div className={`custom-sidebar ${collapsed ? 'collapsed' : ''}`}>
+      <div className="toggle-btn-container">
+        <button
+          className="toggle-btn"
+          onClick={() => setCollapsed(!collapsed)}
+        >
+          {collapsed ? <ChevronRight size={20} /> : <ChevronLeft size={20} />}
+        </button>
       </div>
-      <nav className="flex flex-col space-y-2">
-        {['Chat', 'Instant Meet', 'Profile', 'Organisations'].map((item) => (
+
+      <nav className="nav-menu">
+        {menuItems.map((item) => (
           <button
-            key={item}
-            onClick={() => setActivePage(item.toLowerCase())} // Normalize to lowercase
-            className="flex items-center space-x-3 py-3 px-4 rounded-lg transition-transform duration-200 hover:bg-green-500 hover:scale-105 text-left"
+            key={item.name}
+            onClick={() => setActivePage(item.name.toLowerCase())}
+            className="menu-item"
           >
-            <span className="text-lg">{item}</span>
+            {item.icon}
+            {!collapsed && <span>{item.name}</span>}
           </button>
         ))}
       </nav>
-    </motion.div>
+    </div>
   );
 };
 
