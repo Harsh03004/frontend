@@ -164,10 +164,45 @@ const UserState = (props) => {
           }
     }
     // to be edited by kavya (this will be handled by the backend)
-    const logout = async() => {
-        localStorage.removeItem('accessToken');
-        localStorage.removeItem('refreshToken');
-        navigate("/login");
+    // const logout = async() => {
+    //     localStorage.removeItem('accessToken');
+    //     localStorage.removeItem('refreshToken');
+    //     navigate("/login");
+    //   };
+    const logout = async () => {
+        const refreshToken = localStorage.getItem('refreshToken'); // Retrieve the refresh token from local storage
+      
+        if (!refreshToken) {
+          console.error('No refresh token found');
+          localStorage.removeItem('accessToken');
+          localStorage.removeItem('refreshToken');
+          navigate('/login');
+          return;
+        }
+      
+        try {
+          // Call the backend /logout route
+          const response = await fetch(`${host}api/v1/users/logout`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ refreshToken }), // Send the refresh token to the backend
+          });
+      
+          if (response.ok) {
+            console.log('Logged out successfully');
+          } else {
+            console.error('Failed to log out');
+          }
+        } catch (error) {
+          console.error('Error during logout:', error);
+        } finally {
+          // Clear tokens from local storage and navigate to the login page
+          localStorage.removeItem('accessToken');
+          localStorage.removeItem('refreshToken');
+          navigate('/login');
+        }
       };
     
     // userDetail();

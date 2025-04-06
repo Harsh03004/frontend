@@ -4,14 +4,7 @@ import Profile from './Profile'; // Import the Profile component
 import Chat from '../components/chat'; // Import the Chat component 
 import Organisation from '../components/organisation';
 function HomePage() {
-  const [activePage, setActivePage] = useState('home');
-
-  const organisations = [
-    { id: 1, name: 'Organisation 1', description: 'Description for Organisation 1' },
-    { id: 2, name: 'Organisation 2', description: 'Description for Organisation 2' },
-    { id: 3, name: 'Organisation 3', description: 'Description for Organisation 3' },
-    { id: 4, name: 'Organisation 4', description: 'Description for Organisation 4' },
-  ];
+  const [activePage, setActivePage] = useState('profile');
 
   return (
     <div className="flex">
