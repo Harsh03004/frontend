@@ -2,7 +2,8 @@ import { useState } from 'react';
 // import { json } from 'react-router-dom';
 import userContext from './userContext';
 import { data, useNavigate } from 'react-router-dom';
-import Alert from '../../components/Alert';
+
+import toast from 'react-hot-toast';
 
 const UserState = (props) => {
 
@@ -37,6 +38,7 @@ const UserState = (props) => {
                 // setId(json.data.user)
 
                 props.showAlert("Login successfully", "success")
+                toast.success("Login successfully")
                 navigate("/home");
             }
             else {
