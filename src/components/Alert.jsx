@@ -1,5 +1,4 @@
 import React, { useEffect } from 'react';
-import '../Styles/Alert.css'; // Make sure this file exists
 
 function Alert(props) {
     const capitalize = (word) => {

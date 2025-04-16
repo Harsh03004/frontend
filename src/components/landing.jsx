@@ -4,29 +4,6 @@ import { Link } from 'react-router-dom';
 function Landing() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
-      {/* Navigation */}
-      <nav className="bg-white shadow-sm">
-        <div className="container mx-auto px-6 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-2">
-              <Video className="text-blue-600" size={32} />
-              <span className="text-xl font-bold text-gray-900">MeetPro</span>
-            </div>
-            <div className="flex items-center space-x-4">
-                <Link to="/login">
-                  <button className="px-4 py-2 text-gray-700 hover:text-gray-900 font-medium">
-                    Log In
-                  </button>
-                </Link>
-              <Link to="/register">
-                <button className="px-4 py-2 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition">
-                  Sign up
-                </button>
-            </Link>
-            </div>
-          </div>
-        </div>
-      </nav>
 
       {/* Hero Section */}
       <header className="container mx-auto px-6 py-16 md:py-24">
