@@ -1,82 +1,53 @@
-import React, { useState, useEffect } from "react";
+
+import React, { useState, useContext, useEffect } from "react";
 import { Plus, X } from "lucide-react";
+import organisationContext from "../context/organisations/organisationContext";
 
 const Organisation = () => {
+  const { fetchOrganisations, createOrganisation } = useContext(organisationContext);
   const [organisations, setOrganisations] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [newOrgName, setNewOrgName] = useState("");
   const [newOrgDescription, setNewOrgDescription] = useState("");
   const [creating, setCreating] = useState(false);
   const [showForm, setShowForm] = useState(false);
+  const [shouldFetch, setShouldFetch] = useState(true); // Trigger to reload organisations
 
+  // Fetch organisations when the component is rendered or when `shouldFetch` changes
   useEffect(() => {
-    const fetchOrganisations = async () => {
-      const accessToken = localStorage.getItem("accessToken");
-      const username = localStorage.getItem("username");
-
-      if (!accessToken) {
-        setError("No access token or username found");
-        setLoading(false);
-        return;
-      }
-
-      try {
-        const response = await fetch("http://localhost:3000/api/v1/organisation/getOrganizations", {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ username }),
-        });
-
-        if (!response.ok) {
-          throw new Error("Failed to fetch organisations");
+    const loadOrganisations = async () => {
+      if (shouldFetch) {
+        try {
+          setLoading(true);
+          const data = await fetchOrganisations();
+          setOrganisations(data || []); // Ensure data is an array
+        } catch (err) {
+          setError("Failed to fetch organisations");
+        } finally {
+          setLoading(false);
+          setShouldFetch(false); // Reset the fetch trigger
         }
-
-        const data = await response.json();
-        setOrganisations(data.data || []);
-      } catch (err) {
-        setError("Failed to fetch organisations");
-      } finally {
-        setLoading(false);
       }
     };
 
-    fetchOrganisations();
-  }, []);
+    loadOrganisations();
+  }, [shouldFetch, fetchOrganisations]);
 
+  // Handle creating a new organisation
   const handleCreateOrganisation = async (e) => {
     e.preventDefault();
     setCreating(true);
 
-    const accessToken = localStorage.getItem("accessToken");
-    if (!accessToken) {
-      setError("No access token found");
-      setCreating(false);
-      return;
-    }
-
     try {
-      const response = await fetch("http://localhost:3000/api/v1/organisation/createOrganization", {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ name: newOrgName, description: newOrgDescription }),
+      await createOrganisation({
+        name: newOrgName,
+        description: newOrgDescription,
       });
-
-      if (!response.ok) {
-        throw new Error("Failed to create organisation");
-      }
-
-      const data = await response.json();
-      setOrganisations((prev) => [...prev, data.organization]);
       setNewOrgName("");
       setNewOrgDescription("");
       setShowForm(false);
+      setShouldFetch(true); // Trigger re-fetch of organisations
     } catch (err) {
       setError("Failed to create organisation");
     } finally {
@@ -86,12 +57,12 @@ const Organisation = () => {
 
   return (
     <div className="max-w-4xl mx-auto p-6">
-      {error && <div className="text-center text-red-500 mb-4">{error}</div>}
+      {error && <div className="alert alert-error shadow-lg mb-4">{error}</div>}
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold">Organisations</h1>
         <button
           onClick={() => setShowForm((prev) => !prev)}
-          className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 flex items-center gap-2"
+          className="btn btn-primary flex items-center gap-2"
         >
           {showForm ? <X className="w-5 h-5" /> : <Plus className="w-5 h-5" />} {showForm ? "Cancel" : "New"}
         </button>
@@ -100,7 +71,7 @@ const Organisation = () => {
       {showForm && (
         <form
           onSubmit={handleCreateOrganisation}
-          className="bg-gray-100 p-4 rounded-lg shadow-md mb-6 space-y-4"
+          className="bg-base-200 p-4 rounded-lg shadow-md mb-6 space-y-4"
         >
           <input
             type="text"
@@ -108,19 +79,19 @@ const Organisation = () => {
             value={newOrgName}
             onChange={(e) => setNewOrgName(e.target.value)}
             required
-            className="w-full p-2 border rounded"
+            className="input input-bordered w-full"
           />
           <textarea
             placeholder="Organisation Description"
             value={newOrgDescription}
             onChange={(e) => setNewOrgDescription(e.target.value)}
             required
-            className="w-full p-2 border rounded"
+            className="textarea textarea-bordered w-full"
           />
           <button
             type="submit"
             disabled={creating}
-            className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
+            className={`btn btn-success ${creating ? "loading" : ""}`}
           >
             {creating ? "Creating..." : "Create"}
           </button>
@@ -132,9 +103,14 @@ const Organisation = () => {
       ) : organisations.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {organisations.map((org, index) => (
-            <div key={org._id || index} className="bg-white p-4 rounded-lg shadow-md hover:shadow-lg transition-shadow">
-              <h2 className="text-xl font-bold mb-2">{org.name || "Untitled"}</h2>
-              <p className="text-gray-600">{org.description || "No Description Available"}</p>
+            <div
+              key={org._id || index}
+              className="card bg-base-100 shadow-md hover:shadow-lg transition-shadow"
+            >
+              <div className="card-body">
+                <h2 className="card-title">{org.name || "Untitled"}</h2>
+                <p>{org.description || "No Description Available"}</p>
+              </div>
             </div>
           ))}
         </div>
