@@ -12,6 +12,7 @@ import Navbar from "./components/navbar"
 import RegisterPage from "./pages/RegisterPage.jsx";
 import LoginPage from "./pages/LoginPage";
 import { Toaster } from "react-hot-toast";
+import OrganisationState from "./context/organisations/organisationState.jsx";
 function App() {
 
 
@@ -33,6 +34,7 @@ function App() {
     <>
       <Router>
         <UserState showAlert={showAlert}>
+          <OrganisationState>
           <Alert alert={alert} />
           <div className="flex-1">
             <Navbar />
@@ -49,6 +51,7 @@ function App() {
             </div>
             <Toaster />
           </div>
+          </OrganisationState>
         </UserState>
       </Router>
     </>
