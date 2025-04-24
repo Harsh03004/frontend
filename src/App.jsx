@@ -13,6 +13,8 @@ import RegisterPage from "./pages/RegisterPage.jsx";
 import LoginPage from "./pages/LoginPage";
 import { Toaster } from "react-hot-toast";
 import OrganisationState from "./context/organisations/organisationState.jsx";
+import ClassesState from "./context/classes/classesState.jsx";  
+import Classes from "./components/classes.jsx"; 
 function App() {
 
 
@@ -35,6 +37,7 @@ function App() {
       <Router>
         <UserState showAlert={showAlert}>
           <OrganisationState>
+          <ClassesState>  
           <Alert alert={alert} />
           <div className="flex-1">
             <Navbar />
@@ -47,10 +50,12 @@ function App() {
               <Route exact path="/register" element ={<RegisterPage />} />
               <Route exact path="/forgotPassword" element={<ForgotPassword showAlert={showAlert} />} />
               <Route exact path="/chat" element={<Chat />} />
+              <Route path="/organisation/:organisationId/classes" element={<Classes />} />
             </Routes>
             </div>
             <Toaster />
           </div>
+          </ClassesState>
           </OrganisationState>
         </UserState>
       </Router>
