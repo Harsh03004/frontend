@@ -99,10 +99,9 @@ import React, { useState } from "react";
 import { MessageCircle, Video, User, Building2, ChevronLeft, ChevronRight } from "lucide-react";
 
 const menuItems = [
-  { name: "Chat", icon: <MessageCircle size={18} /> },
   { name: "Instant Meet", icon: <Video size={18} /> },
   { name: "Profile", icon: <User size={18} /> },
-  { name: "Organisations", icon: <Building2 size={18} /> },
+  { name: "Organisation", icon: <Building2 size={18} /> },
 ];
 
 const Sidebar = ({ setActivePage }) => {
