@@ -1,36 +1,61 @@
-import React, { useState } from "react";
-import Sidebar from "../components/sidebar";
-import Profile from "./Profile";
-import Chat from "../components/chat";
-import Organisation from "../components/organisation";
+// import React, { useState } from "react";
+// import Sidebar from "../components/sidebar";
+// import Profile from "./Profile";
+// import Chat from "../components/chat";
+// import Organisation from "../components/organisation";
 
-function HomePage() {
-  const [activePage, setActivePage] = useState("profile");
-  const [shouldFetch, setShouldFetch] = useState(false);
+// function HomePage() {
+//   const [activePage, setActivePage] = useState("profile");
+//   const [shouldFetch, setShouldFetch] = useState(false);
+
+//   const handlePageChange = (page) => {
+//     setActivePage(page.toLowerCase());
+//     if (page.toLowerCase() === "organisations") {
+//       setShouldFetch(true); // Trigger fetch when "Organisations" is clicked
+//     }
+//   };
+
+//   return (
+//     <div className="flex">
+//       <Sidebar setActivePage={handlePageChange} />
+//       <div className="w-full">
+//         {activePage === "organisations" ? (
+//           <Organisation setShouldFetch={setShouldFetch} shouldFetch={shouldFetch} />
+//         ) : activePage === "profile" ? (
+//           <Profile />
+//         ) : activePage === "chat" ? (
+//           <Chat />
+//         ) : (
+//           <h1 className="text-2xl font-bold capitalize">{activePage} Page</h1>
+//         )}
+//       </div>
+//     </div>
+//   );
+// }
+
+// export default HomePage;
+
+
+
+// pages/HomeLayout.jsx
+import { Outlet, useNavigate } from "react-router-dom";
+import Sidebar from "../components/sidebar";
+
+function HomeLayout() {
+  const navigate = useNavigate();
 
   const handlePageChange = (page) => {
-    setActivePage(page.toLowerCase());
-    if (page.toLowerCase() === "organisations") {
-      setShouldFetch(true); // Trigger fetch when "Organisations" is clicked
-    }
+    navigate(`/home/${page.toLowerCase()}`);
   };
 
   return (
     <div className="flex">
       <Sidebar setActivePage={handlePageChange} />
       <div className="w-full">
-        {activePage === "organisations" ? (
-          <Organisation setShouldFetch={setShouldFetch} shouldFetch={shouldFetch} />
-        ) : activePage === "profile" ? (
-          <Profile />
-        ) : activePage === "chat" ? (
-          <Chat />
-        ) : (
-          <h1 className="text-2xl font-bold capitalize">{activePage} Page</h1>
-        )}
+        <Outlet />
       </div>
     </div>
   );
 }
 
-export default HomePage;
+export default HomeLayout;

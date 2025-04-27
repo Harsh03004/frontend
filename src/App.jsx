@@ -15,6 +15,7 @@ import { Toaster } from "react-hot-toast";
 import OrganisationState from "./context/organisations/organisationState.jsx";
 import ClassesState from "./context/classes/classesState.jsx";  
 import Classes from "./components/classes.jsx"; 
+import Organisation from "./components/organisation.jsx";
 function App() {
 
 
@@ -44,13 +45,20 @@ function App() {
             <div className ="pt-16 px-4">
             <Routes>
               <Route exact path="/" element={<Landing showAlert={showAlert} />} />
-              <Route exact path="/home" element={<HomePage />} />
-              <Route exact path="/profile" element={<Profile showAlert={showAlert} />} />
+              {/* <Route exact path="/home" element={<HomePage />} /> */}
+              {/* <Route exact path="/profile" element={<Profile showAlert={showAlert} />} /> */}
               <Route path="/login" element={!userId ? <LoginPage showAlert = {showAlert} /> : <Navigate to="/" />} />
               <Route exact path="/register" element ={<RegisterPage />} />
               <Route exact path="/forgotPassword" element={<ForgotPassword showAlert={showAlert} />} />
-              <Route exact path="/chat" element={<Chat />} />
-              <Route path="/organisation/:organisationId/classes" element={<Classes />} />
+              {/* <Route exact path="/chat" element={<Chat />} /> */}
+              {/* <Route path="/organisation/:organisationId/classes" element={<Classes />} /> */}
+
+              <Route path="/home" element={<HomePage />} >
+                <Route exact path="organisation" element={<Organisation showAlert={showAlert} />} />
+                <Route exact path="chat" element={<Chat />} />
+                <Route exact path="profile" element={<Profile showAlert={showAlert} />} />
+              </Route>
+                <Route exact path="/organisation/:organisationId/classes" element={<Classes />} />
             </Routes>
             </div>
             <Toaster />
