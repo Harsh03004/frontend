@@ -261,7 +261,7 @@
 
 
 
-import React, { useState, useContext, useEffect } from "react";
+import React, { useState, useContext, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom"; // Import useNavigate
 import { Plus, X } from "lucide-react";
 import organisationContext from "../context/organisations/organisationContext";
@@ -282,24 +282,27 @@ const Organisation = () => {
 
   const navigate = useNavigate(); // Initialize useNavigate
 
-  useEffect(() => {
-    const loadOrganisations = async () => {
-      if (shouldFetch) {
-        try {
-          setLoading(true);
-          const data = await fetchOrganisations();
-          setOrganisations(data || []);
-        } catch (err) {
-          setError("Failed to fetch organisations");
-        } finally {
-          setLoading(false);
-          setShouldFetch(false);
-        }
-      }
-    };
+  const hasFetched = useRef(false); // 👈 this is the important line
 
+  const loadOrganisations = async () => {
+    if (hasFetched.current) return; // ✅ Prevent double fetch
+    hasFetched.current = true; // ✅ Mark as fetched
+    try {
+      setLoading(true);
+      const data = await fetchOrganisations();
+      setOrganisations(data || []);
+    } catch (err) {
+      setError("Failed to fetch organisations");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  
+  useEffect(() => {
     loadOrganisations();
-  }, [shouldFetch, fetchOrganisations]);
+    // eslint-disable-next-line
+  }, [ shouldFetch, fetchOrganisations ]); // Fetch organisations when the component is rendered or when `shouldFetch` changes
 
   const handleCreateOrganisation = async (e) => {
     e.preventDefault();
@@ -313,6 +316,8 @@ const Organisation = () => {
       setNewOrgName("");
       setNewOrgDescription("");
       setShowForm(false);
+      hasFetched.current = false;
+      await loadOrganisations();
       setShouldFetch(true);
     } catch (err) {
       setError("Failed to create organisation");
