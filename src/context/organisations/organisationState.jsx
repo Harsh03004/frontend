@@ -79,8 +79,39 @@ const OrganisationState = (props) => {
             toast.error(error.message || "Error creating organisation");
         }
     };
+
+
+    const deleteOrganisation = async (organisationId) => {
+        try {
+            const accessToken = localStorage.getItem("accessToken");
+            if (!accessToken) {
+                throw new Error("No access token found");
+            }
+    
+            const response = await fetch(`${host}/api/v1/organisation/deleteOrganisation/${organisationId}`, {
+                method: "DELETE",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${accessToken}`,
+                },
+            });
+            console.log("API Response:", response); // Log the full API response for debugging
+            if (response.status === 200) {
+                setOrganisations((prevOrganisations) =>
+                    prevOrganisations.filter((org) => org._id !== organisationId)
+                );
+                toast.success("Organisation deleted successfully");
+            } else {
+                toast.error("Failed to delete organisation");
+            }
+        } catch (error) {
+            console.error("Error deleting organisation:", error);
+            toast.error(error.message || "Error deleting organisation");
+        }
+    }
+
     return (
-        <organisationContext.Provider value={{ fetchOrganisations, createOrganisation }}>
+        <organisationContext.Provider value={{ fetchOrganisations, createOrganisation, deleteOrganisation }}>
             {props.children}
         </organisationContext.Provider>
     );

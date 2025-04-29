@@ -1,43 +1,11 @@
 import React, { useState } from "react";
 import ClassesContext from "./classesContext";
-
+import { toast } from "react-hot-toast";  
 const ClassesState = ({ children }) => {
   const [classes, setClasses] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  // Fetch classes for an organisation
-  // const host = "http://localhost:3000";
-  // const fetchClasses = async (organizationId) => {
-  //   try {
-  //     setLoading(true);
-  //     const response = await fetch(`${host}/api/v1/organisation/${organizationId}/classes`);
-  //     const data = await response.json();
-  //     setClasses(data || []);
-  //   } catch (err) {
-  //     setError("Failed to fetch classes");
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // };
-
-  // // Create a new class
-  // const createClass = async (organisationId, newClass) => {
-  //   try {
-  //     setLoading(true);
-  //     const response = await fetch(`${host}/api/organisation/${organisationId}/createClass`, {
-  //       method: "POST",
-  //       headers: { "Content-Type": "application/json" },
-  //       body: JSON.stringify(newClass),
-  //     });
-  //     const createdClass = await response.json();
-  //     setClasses((prev) => [...prev, createdClass]);
-  //   } catch (err) {
-  //     setError("Failed to create class");
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // };
 
   const host = "http://localhost:3000";
 
@@ -82,9 +50,11 @@ const ClassesState = ({ children }) => {
   
       const result = await response.json();
   
-      if (!response.ok) throw new Error(result.message || "Error creating class");
+      if(response.status === 200) {
+        setClasses((prev) => [...prev, result.data]);
+        toast.success("Class created successfully");  
+      } 
   
-      setClasses((prev) => [...prev, result.data]);
     } catch (err) {
       console.error(err);
       setError(err.message || "Failed to create class");
@@ -92,6 +62,31 @@ const ClassesState = ({ children }) => {
       setLoading(false);
     }
   };
+
+  const deleteClass = async (organizationId, classId) => {
+    try {
+
+      setLoading(true);
+      const response = await fetch(`${host}/api/v1/organisation/${organizationId}/deleteClass/${classId}`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${token}`, // if needed
+          "Content-Type": "application/json",
+        },
+      });
+
+      if(response.status === 200) {
+        console.log("Class deleted successfully");
+        setClasses((prev) => prev.filter((cls) => cls._id !== classId));
+        toast.success("Class deleted successfully");
+      }
+    } catch (err) {
+      toast.error(err.message || "Failed to delete class"); 
+    } finally {
+      setLoading(false);
+    }
+  }
+
   
 
   return (
@@ -102,6 +97,7 @@ const ClassesState = ({ children }) => {
         error,
         fetchClasses,
         createClass,
+        deleteClass,
       }}
     >
       {children}
