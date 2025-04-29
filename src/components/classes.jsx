@@ -114,7 +114,7 @@ import { Plus, X } from "lucide-react";
 
 const Classes = () => {
   const { organisationId } = useParams(); // FIXED here
-  const { classes, loading, error, fetchClasses, createClass } = useContext(ClassesContext);
+  const { classes, loading, error, fetchClasses, createClass, deleteClass } = useContext(ClassesContext);
   const navigate = useNavigate();
   
   const [newClassName, setNewClassName] = useState("");
@@ -141,6 +141,20 @@ const Classes = () => {
 
   const handleGoBack = () => {
     navigate(-1);
+  };
+
+  const handleDeleteClass = async (classId) => {
+  console.log(classId)
+  console.log(organisationId)
+    try {
+      await deleteClass(organisationId, classId); // Call the API to delete the class
+      classes((prev) => prev.filter((cls) => cls._id !== classId)); // Remove the deleted class from the state
+    } catch (err) {
+      setError ("Failed to delete class");
+    }finally
+    {
+      loading(false);
+    }
   };
 
   return (
@@ -200,18 +214,26 @@ const Classes = () => {
         <div className="text-center text-gray-500">Loading classes...</div>
       ) : classes.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {classes.map((cls, index) => (
-            <div
-              key={cls._id || index}
-              className="card bg-base-100 shadow-md hover:shadow-lg transition-shadow"
-            >
-              <div className="card-body">
-                <h2 className="card-title">{cls.name || "Untitled"}</h2>
-                <p>{cls.description || "No Description Available"}</p>
-              </div>
-            </div>
-          ))}
+  {classes.map((cls, index) => (
+    <div
+      key={cls._id || index}
+      className="card bg-base-100 shadow-md hover:shadow-lg transition-shadow"
+    >
+      <div className="card-body">
+        <h2 className="card-title">{cls.name || "Untitled"}</h2>
+        <p>{cls.description || "No Description Available"}</p>
+        <div className="flex justify-end gap-2 mt-4">
+          <button
+            className="btn btn-error btn-sm"
+            onClick={() => handleDeleteClass(cls._id)}
+          >
+            Delete
+          </button>
         </div>
+      </div>
+    </div>
+  ))}
+</div>
       ) : (
         <div className="text-center text-gray-500">No classes found</div>
       )}

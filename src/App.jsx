@@ -15,6 +15,7 @@ import { Toaster } from "react-hot-toast";
 import OrganisationState from "./context/organisations/organisationState.jsx";
 import ClassesState from "./context/classes/classesState.jsx";  
 import Classes from "./components/classes.jsx"; 
+import ClassPage from "./pages/classPage.jsx";
 import Organisation from "./components/organisation.jsx";
 function App() {
 
@@ -59,6 +60,7 @@ function App() {
                 <Route exact path="profile" element={<Profile showAlert={showAlert} />} />
               </Route>
                 <Route exact path="/organisation/:organisationId/classes" element={<Classes />} />
+                <Route exact path="/classes" element={<ClassPage />} />
             </Routes>
             </div>
             <Toaster />
