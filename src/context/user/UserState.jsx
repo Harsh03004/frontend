@@ -39,7 +39,7 @@ const UserState = (props) => {
 
                 props.showAlert("Login successfully", "success")
                 toast.success("Login successfully")
-                navigate("/home");
+                navigate("/home/profile");
             }
             else {
                 props.showAlert("Invalid credentials", "danger")
