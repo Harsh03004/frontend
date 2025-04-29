@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route, Navigate} from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import React, { useState } from 'react';
 import Profile from "./pages/Profile";
 import Chat from "./components/chat";
@@ -13,10 +13,12 @@ import RegisterPage from "./pages/RegisterPage.jsx";
 import LoginPage from "./pages/LoginPage";
 import { Toaster } from "react-hot-toast";
 import OrganisationState from "./context/organisations/organisationState.jsx";
-import ClassesState from "./context/classes/classesState.jsx";  
-import Classes from "./components/classes.jsx"; 
+import ClassesState from "./context/classes/classesState.jsx";
+import Classes from "./components/classes.jsx";
 import ClassPage from "./pages/classPage.jsx";
 import Organisation from "./components/organisation.jsx";
+// import Room from "./pages/Room.jsx";
+// import Lobby from "./pages/Lobby.jsx";
 function App() {
 
 
@@ -36,36 +38,51 @@ function App() {
 
   return (
     <>
+      {/* <Router>
+        <Routes>
+          <Route exact path="/room" element={<Room />} />
+          <Route exact path="/lobby" element={<Lobby />} />
+        </Routes>
+      </Router> */}
       <Router>
         <UserState showAlert={showAlert}>
           <OrganisationState>
-          <ClassesState>  
-          <Alert alert={alert} />
-          <div className="flex-1">
-            <Navbar />
-            <div className ="pt-16 px-4">
-            <Routes>
-              <Route exact path="/" element={<Landing showAlert={showAlert} />} />
-              {/* <Route exact path="/home" element={<HomePage />} /> */}
-              {/* <Route exact path="/profile" element={<Profile showAlert={showAlert} />} /> */}
-              <Route path="/login" element={!userId ? <LoginPage showAlert = {showAlert} /> : <Navigate to="/" />} />
-              <Route exact path="/register" element ={<RegisterPage />} />
-              <Route exact path="/forgotPassword" element={<ForgotPassword showAlert={showAlert} />} />
-              {/* <Route exact path="/chat" element={<Chat />} /> */}
-              {/* <Route path="/organisation/:organisationId/classes" element={<Classes />} /> */}
+            <ClassesState>
 
-              <Route path="/home" element={<HomePage />} >
-                <Route exact path="organisation" element={<Organisation showAlert={showAlert} />} />
-                <Route exact path="chat" element={<Chat />} />
-                <Route exact path="profile" element={<Profile showAlert={showAlert} />} />
-              </Route>
-                <Route exact path="/organisation/:organisationId/classes" element={<Classes />} />
-                <Route exact path="/classes" element={<ClassPage />} />
-            </Routes>
-            </div>
-            <Toaster />
-          </div>
-          </ClassesState>
+              <Alert alert={alert} />
+              <div className="flex-1">
+                {/* <Routes>
+          <Route exact path="/room" element={<Room />} />
+
+          </Routes> */}
+
+                <Navbar />
+                <div className="pt-16 px-4">
+                  <Routes>
+                    <Route exact path="/" element={<Landing showAlert={showAlert} />} />
+                    {/* <Route exact path="/home" element={<HomePage />} /> */}
+                    {/* <Route exact path="/profile" element={<Profile showAlert={showAlert} />} /> */}
+                    <Route path="/login" element={!userId ? <LoginPage showAlert={showAlert} /> : <Navigate to="/" />} />
+                    <Route exact path="/register" element={<RegisterPage />} />
+                    <Route exact path="/forgotPassword" element={<ForgotPassword showAlert={showAlert} />} />
+                    {/* <Route exact path="/room" element={<Room />} /> */}
+
+                    {/* <Route exact path="/lobby" element={<Lobby />} /> */}
+                    {/* <Route exact path="/chat" element={<Chat />} /> */}
+                    {/* <Route path="/organisation/:organisationId/classes" element={<Classes />} /> */}
+
+                    <Route path="/home" element={<HomePage />} >
+                      <Route exact path="organisation" element={<Organisation showAlert={showAlert} />} />
+                      <Route exact path="chat" element={<Chat />} />
+                      <Route exact path="profile" element={<Profile showAlert={showAlert} />} />
+                    </Route>
+                    <Route exact path="/organisation/:organisationId/classes" element={<Classes />} />
+                    <Route exact path="/classes" element={<ClassPage />} />
+                  </Routes>
+                </div>
+                <Toaster />
+              </div>
+            </ClassesState>
           </OrganisationState>
         </UserState>
       </Router>
