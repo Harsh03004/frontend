@@ -17,8 +17,12 @@ import ClassesState from "./context/classes/classesState.jsx";
 import Classes from "./components/classes.jsx";
 import ClassPage from "./pages/classPage.jsx";
 import Organisation from "./components/organisation.jsx";
+
+import Invite from "./components/invite.jsx";
+
 // import Room from "./pages/Room.jsx";
 // import Lobby from "./pages/Lobby.jsx";
+
 function App() {
 
 
@@ -49,6 +53,21 @@ function App() {
           <OrganisationState>
             <ClassesState>
 
+
+              <Route path="/home" element={<HomePage />} >
+                <Route exact path="organisation" element={<Organisation showAlert={showAlert} />} />
+                <Route exact path="chat" element={<Chat />} />
+                <Route exact path="invites" element={<Invite />} />
+                <Route exact path="profile" element={<Profile showAlert={showAlert} />} />
+              </Route>
+                <Route exact path="/organisation/:organisationId/classes" element={<Classes />} />
+                <Route exact path="/organisation/:organisationId/classes/:classId" element={<ClassPage />} />
+            </Routes>
+            </div>
+            <Toaster />
+          </div>
+          </ClassesState>
+
               <Alert alert={alert} />
               <div className="flex-1">
                 {/* <Routes>
@@ -60,16 +79,11 @@ function App() {
                 <div className="pt-16 px-4">
                   <Routes>
                     <Route exact path="/" element={<Landing showAlert={showAlert} />} />
-                    {/* <Route exact path="/home" element={<HomePage />} /> */}
-                    {/* <Route exact path="/profile" element={<Profile showAlert={showAlert} />} /> */}
                     <Route path="/login" element={!userId ? <LoginPage showAlert={showAlert} /> : <Navigate to="/" />} />
                     <Route exact path="/register" element={<RegisterPage />} />
                     <Route exact path="/forgotPassword" element={<ForgotPassword showAlert={showAlert} />} />
-                    {/* <Route exact path="/room" element={<Room />} /> */}
 
-                    {/* <Route exact path="/lobby" element={<Lobby />} /> */}
-                    {/* <Route exact path="/chat" element={<Chat />} /> */}
-                    {/* <Route path="/organisation/:organisationId/classes" element={<Classes />} /> */}
+
 
                     <Route path="/home" element={<HomePage />} >
                       <Route exact path="organisation" element={<Organisation showAlert={showAlert} />} />
@@ -77,12 +91,12 @@ function App() {
                       <Route exact path="profile" element={<Profile showAlert={showAlert} />} />
                     </Route>
                     <Route exact path="/organisation/:organisationId/classes" element={<Classes />} />
-                    <Route exact path="/classes" element={<ClassPage />} />
                   </Routes>
                 </div>
                 <Toaster />
               </div>
             </ClassesState>
+
           </OrganisationState>
         </UserState>
       </Router>
