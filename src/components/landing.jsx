@@ -17,7 +17,7 @@ function Landing() {
               Experience crystal-clear video meetings, real-time collaboration, and secure communication all in one powerful platform.
             </p>
             <div className="flex gap-4">
-              <a href="https://samplestumeet.netlify.app/lobby.html" target='_blank'>
+              <a href="localhost:5173/room?room=123" target='_blank'>
                 <button className="px-8 py-4 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition flex items-center gap-2">
                   Get Started Instant Meeting <ArrowRight size={20} />
                 </button>
