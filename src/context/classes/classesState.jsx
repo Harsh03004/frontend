@@ -87,7 +87,33 @@ const ClassesState = ({ children }) => {
     }
   }
 
+  const sendInvite = async (organizationId, classId, username) => {
+    try {
+      setLoading(true);
   
+      const response = await fetch(`${host}/api/v1/organisation/${organizationId}/classes/${classId}/invite`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`, // Include the token for authentication
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ username }), // Send the username instead of email
+      });
+  
+      const result = await response.json();
+  
+      if (response.status === 200) {
+        toast.success("Invite sent successfully");
+      } else {
+        throw new Error(result.message || "Failed to send invite");
+      }
+    } catch (err) {
+      console.error(err);
+      toast.error(err.message || "Failed to send invite");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <ClassesContext.Provider
@@ -98,6 +124,7 @@ const ClassesState = ({ children }) => {
         fetchClasses,
         createClass,
         deleteClass,
+        sendInvite
       }}
     >
       {children}

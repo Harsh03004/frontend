@@ -1,6 +1,7 @@
 import { useState } from 'react';
 // import { json } from 'react-router-dom';
 import userContext from './userContext';
+// import {connect, io} from 'socket.io-client';
 import { data, useNavigate } from 'react-router-dom';
 
 import toast from 'react-hot-toast';
@@ -10,8 +11,29 @@ const UserState = (props) => {
     let navigate = useNavigate();
 
     const [id, setId] = useState("");
-
+    const [socket, setSocket] = useState(null); 
     const host = "http://localhost:3000/"
+
+//     const connectSocket = (userId) => {
+//       if (socket?.connected) return; // Avoid reconnecting if already connected
+
+//       const newSocket = io(host, {
+//           query: { userId }, // Pass the user ID to the server
+//       });
+
+//       newSocket.connect();
+//       setSocket(newSocket);
+
+//       newSocket.on("getOnlineUsers", (onlineUsers) => {
+//           console.log("Online Users:", onlineUsers);
+//       });
+//   };
+//   const disconnectSocket = () => {
+//     if (socket?.connected) {
+//         socket.disconnect();
+//         setSocket(null);
+//     }
+// };
 
     const loginUser = async (credentials) => {
         const response = await fetch(`${host}api/v1/users/login`, {
@@ -36,7 +58,7 @@ const UserState = (props) => {
                 localStorage.setItem('refreshToken', json.data.refreshToken); // Store refresh token
                 console.log(json.data.user)
                 // setId(json.data.user)
-
+                // connectSocket(json.data.user._id); // Connect to socket with user ID
                 props.showAlert("Login successfully", "success")
                 toast.success("Login successfully")
                 navigate("/home");
@@ -178,6 +200,7 @@ const UserState = (props) => {
           console.error('No refresh token found');
           localStorage.removeItem('accessToken');
           localStorage.removeItem('refreshToken');
+          // disconnectSocket();
           navigate('/login');
           return;
         }
@@ -204,6 +227,7 @@ const UserState = (props) => {
           // Clear tokens from local storage and navigate to the login page
           localStorage.removeItem('accessToken');
           localStorage.removeItem('refreshToken');
+          // disconnectSocket();
           navigate('/login');
         }
       };

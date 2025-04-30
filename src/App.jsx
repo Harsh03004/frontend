@@ -17,6 +17,7 @@ import ClassesState from "./context/classes/classesState.jsx";
 import Classes from "./components/classes.jsx"; 
 import ClassPage from "./pages/classPage.jsx";
 import Organisation from "./components/organisation.jsx";
+import Invite from "./components/invite.jsx";
 function App() {
 
 
@@ -57,10 +58,11 @@ function App() {
               <Route path="/home" element={<HomePage />} >
                 <Route exact path="organisation" element={<Organisation showAlert={showAlert} />} />
                 <Route exact path="chat" element={<Chat />} />
+                <Route exact path="invites" element={<Invite />} />
                 <Route exact path="profile" element={<Profile showAlert={showAlert} />} />
               </Route>
                 <Route exact path="/organisation/:organisationId/classes" element={<Classes />} />
-                <Route exact path="/classes" element={<ClassPage />} />
+                <Route exact path="/organisation/:organisationId/classes/:classId" element={<ClassPage />} />
             </Routes>
             </div>
             <Toaster />
