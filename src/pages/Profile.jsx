@@ -131,10 +131,10 @@ function Profile() {
   const checkAndRefreshToken = async () => {
     const accessToken = localStorage.getItem("accessToken");
     if (accessToken && accessToken !== undefined) {
-      userDetail();
+      await userDetail();
       return;
     }
-    checkRefreshToken();
+    await checkRefreshToken();
   };
 
   const hasRun = useRef(false);
@@ -145,6 +145,7 @@ function Profile() {
     }
     // eslint-disable-next-line
   }, []);
+
 
   const [profileImage, setProfileImage] = useState(id?.avatar);
   const [isUpdatingProfile, setIsUpdatingProfile] = useState(false);

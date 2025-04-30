@@ -1,21 +1,35 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useContext, useEffect, useRef, useState } from 'react';
 import AgoraRTC from 'agora-rtc-sdk-ng';
 import { useNavigate } from 'react-router-dom'
+import userContext from "../context/user/userContext";
 import './styles/main.css';
 import './styles/room.css';
 
 const Room = () => {
   const APP_ID = "53bd41defce64a9eb9b17038c118ed3f";
-  const navigate = useNavigate();
-  const [uid] = useState(() => {
-    let storedUid = sessionStorage.getItem("uid");
-    if (!storedUid) {
-      storedUid = String(Math.floor(Math.random() * 10000));
-      sessionStorage.setItem("uid", storedUid);
+
+  const { id, updateAvatar, checkRefreshToken, userDetail } = useContext(userContext);
+
+  let navigate = useNavigate();
+  const checkAndRefreshToken = async () => {
+    const accessToken = localStorage.getItem("accessToken");
+    if (accessToken && accessToken !== undefined) {
+      await userDetail();
+      return;
     }
-    console.log("User ID:", storedUid);
-    return storedUid;
-  });
+    await checkRefreshToken("/lobby");
+  };
+
+  const hasRun = useRef(false);
+  const hasJoined = useRef(false);
+  useEffect(() => {
+    if (!hasRun.current) {
+      hasRun.current = true;
+      checkAndRefreshToken();
+    }
+    // eslint-disable-next-line
+  }, []);
+
 
   const [roomId] = useState(() => {
     const urlParam = new URLSearchParams(window.location.search);
@@ -24,7 +38,10 @@ const Room = () => {
     return storedRoomId;
   });
 
-  const displayName = localStorage.getItem('display_name');
+  const [profileImage, setProfileImage] = useState(id?.avatar);
+  const [displayName, setdisplayName] = useState(id?.fullname);
+
+  // const displayName = localStorage.getItem('display_name');
   const streamsContainerRef = useRef(null);
   const displayFrameRef = useRef(null);
   const messagesContainerRef = useRef(null);
@@ -39,19 +56,54 @@ const Room = () => {
   const [activeChatContainer, setActiveChatContainer] = useState(false);
   const [userIdInDisplayFrame, setUserIdInDisplayFrame] = useState(null);
 
+
+
+  // useEffect(() => {
+  //   const hasJoined = useRef(false);
+  
+  //   const joinRoomInit = async () => {
+  //     if (hasJoined.current) return; // Prevent multiple joins
+  //     hasJoined.current = true;
+  
+  //     try {
+  //       await client.join(APP_ID, roomId, null, id);
+  //       client.on('user-published', handleUserPublished);
+  //       client.on('user-left', handleUserLeft);
+  //       await joinStream();
+  //     } catch (error) {
+  //       console.error('Error joining room:', error);
+  //       hasJoined.current = false; // Allow retry on failure
+  //     }
+  //   };
+  
+  //   joinRoomInit();
+  
+  //   return () => {
+  //     localTracksRef.current.forEach(track => track && track.close());
+  //     client.leave();
+  //   };
+  // }, [client, roomId, id]);
+
+
   useEffect(() => {
-    if (!displayName) {
-      navigate('/lobby'); // Use navigate instead of window.location
-      return;
-    }
+    // if (!displayName) {
+    //   navigate('/lobby'); // Use navigate instead of window.location
+    //   return;
+    // }
+
+    // if (!hasRun.current) {
+    //   hasRun.current = true;
+    //   checkAndRefreshToken();
+    // }
 
     if (messagesContainerRef.current) {
       messagesContainerRef.current.scrollTop = messagesContainerRef.current.scrollHeight;
     }
 
     const joinRoomInit = async () => {
+      if (hasJoined.current) return;
       try {
-        await client.join(APP_ID, roomId, null, uid);
+        await client.join(APP_ID, roomId, null, id);
         client.on('user-published', handleUserPublished);
         client.on('user-left', handleUserLeft);
         await joinStream();
@@ -66,7 +118,9 @@ const Room = () => {
       localTracksRef.current.forEach(track => track && track.close());
       client.leave();
     };
-  }, [client, displayName, roomId, uid]);
+
+
+  }, [client, roomId]);
 
   useEffect(() => {
     if (displayFrameRef.current) {
@@ -89,9 +143,9 @@ const Room = () => {
         },
       });
       localTracksRef.current = localTracks;
-      console.log("user id", uid);
-      addVideoPlayer(uid);
-      localTracks[1].play(`user-${uid}`);
+      console.log("user id", id);
+      addVideoPlayer(id);
+      localTracks[1].play(`user-${id}`);
       await client.publish(localTracks);
     } catch (error) {
       console.error('Error joining stream:', error);
@@ -112,10 +166,10 @@ const Room = () => {
 
   const switchToCamera = async () => {
     try {
-      addVideoPlayer(uid);
+      addVideoPlayer(id);
       await localTracksRef.current[1].setMuted(true);
       document.getElementById('camera-btn').classList.remove('active');
-      localTracksRef.current[1].play(`user-${uid}`);
+      localTracksRef.current[1].play(`user-${id}`);
       await client.publish([localTracksRef.current[1]]);
     } catch (error) {
       console.error('Error switching to camera:', error);
@@ -123,15 +177,15 @@ const Room = () => {
   };
 
   const handleUserPublished = async (user, mediaType) => {
-    remoteUsersRef.current[user.uid] = user;
+    remoteUsersRef.current[user.id] = user;
     await client.subscribe(user, mediaType);
 
-    if (!document.getElementById(`user-container-${user.uid}`)) {
-      addVideoPlayer(user.uid);
+    if (!document.getElementById(`user-container-${user.id}`)) {
+      addVideoPlayer(user.id);
     }
 
     if (displayFrameRef.current?.style.display === 'block') {
-      const videoFrame = document.getElementById(`user-container-${user.uid}`);
+      const videoFrame = document.getElementById(`user-container-${user.id}`);
       if (videoFrame) {
         videoFrame.style.height = '100px';
         videoFrame.style.width = '100px';
@@ -139,7 +193,7 @@ const Room = () => {
     }
 
     if (mediaType === 'video') {
-      user.videoTrack.play(`user-${user.uid}`);
+      user.videoTrack.play(`user-${user.id}`);
     }
     if (mediaType === 'audio') {
       user.audioTrack.play();
@@ -147,11 +201,11 @@ const Room = () => {
   };
 
   const handleUserLeft = (user) => {
-    delete remoteUsersRef.current[user.uid];
-    const userContainer = document.getElementById(`user-container-${user.uid}`);
+    delete remoteUsersRef.current[user.id];
+    const userContainer = document.getElementById(`user-container-${user.id}`);
     if (userContainer) userContainer.remove();
 
-    if (userIdInDisplayFrame === `user-container-${user.uid}`) {
+    if (userIdInDisplayFrame === `user-container-${user.id}`) {
       hideDisplayFrame();
     }
   };
@@ -196,12 +250,12 @@ const Room = () => {
         cameraButton.style.display = 'none';
 
         localScreenTrackRef.current = await AgoraRTC.createScreenVideoTrack();
-        document.getElementById(`user-container-${uid}`)?.remove();
+        document.getElementById(`user-container-${id}`)?.remove();
 
-        addVideoPlayer(uid);
-        setUserIdInDisplayFrame(`user-container-${uid}`);
+        addVideoPlayer(id);
+        setUserIdInDisplayFrame(`user-container-${id}`);
 
-        localScreenTrackRef.current.play(`user-${uid}`);
+        localScreenTrackRef.current.play(`user-${id}`);
         await client.unpublish([localTracksRef.current[1]]);
         await client.publish([localScreenTrackRef.current]);
 
@@ -220,7 +274,7 @@ const Room = () => {
       setSharingScreen(false);
       cameraButton.style.display = 'block';
       screenButton.classList.remove('active');
-      document.getElementById(`user-container-${uid}`)?.remove();
+      document.getElementById(`user-container-${id}`)?.remove();
 
       await client.unpublish([localScreenTrackRef.current]);
       localScreenTrackRef.current = null;
@@ -277,7 +331,9 @@ const Room = () => {
     }
   };
 
-  const handleLeave = () => {
+  const handleLeave = async () => {
+    await client.leave();
+  localTracksRef.current.forEach(track => track && track.close());
     navigate('/lobby'); // Use navigate instead of window.location
   };
 
@@ -293,7 +349,7 @@ const Room = () => {
           </button>
           <a href="/lobby">
             <h3 id="logo">
-              <img src="../../public/images/logo.png" alt="Site Logo" />
+              <img src="C:\Users\Dell\Desktop\minor2\frontend\src\assets\images\logo.png" alt="Site Logo" />
               <span>StuMeet</span>
             </h3>
           </a>

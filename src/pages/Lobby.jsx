@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate, useLocation, Link } from 'react-router-dom'; // Add Link import
 import './styles/main.css';
 import './styles/lobby.css';
-import logo from '../../public/images/logo.png';
+import logo from '../assets/images/logo.png';
 
 const LobbyPage = () => {
   const [displayName, setDisplayName] = useState('');

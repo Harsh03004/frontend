@@ -39,7 +39,7 @@ const UserState = (props) => {
 
                 props.showAlert("Login successfully", "success")
                 toast.success("Login successfully")
-                navigate("/home");
+                navigate("/home/profile");
             }
             else {
                 props.showAlert("Invalid credentials", "danger")
@@ -132,7 +132,7 @@ const UserState = (props) => {
         }
     };
 
-    const checkRefreshToken =  async ()=>{
+    const checkRefreshToken =  async (pathOfPage)=>{
         try {
             const response = await fetch(`${host}api/v1/users/refreshToken`, {
               method: 'POST',
@@ -150,7 +150,7 @@ const UserState = (props) => {
               console.log("------------------")
               console.log("access token= "+json.data.accessToken);
               if(json.data.accessToken===undefined){
-                navigate("/login");
+                navigate(`${pathOfPage}`);
                 return;
               }
               localStorage.setItem('accessToken', json.data.accessToken);
