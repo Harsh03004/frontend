@@ -449,11 +449,18 @@ const Room = () => {
         </div>
 
         <div id="nav__links">
-          <button id="chat__button" onClick={handleChatButtonClick}>
+          {/* <button id="chat__button" onClick={handleChatButtonClick}>
             <svg width="24" height="24" xmlns="http://www.w3.org/2000/svg" fillRule="evenodd" fill="#ede0e0" clipRule="evenodd">
               <path d="M24 20h-3v4l-5.333-4h-7.667v-4h2v2h6.333l2.667 2v-2h3v-8.001h-2v-2h4v12.001zm-15.667-6l-5.333 4v-4h-3v-14.001l18 .001v14h-9.667zm-6.333-2h3v2l2.667-2h8.333v-10l-14-.001v10.001z" />
             </svg>
-          </button>
+          </button> */}
+          <a href={`http://localhost:5173/organisation/680f3b01113d4f5045f1f0e9/classes/68133744d40b38055c5c3469`} target='_blank'>
+            <button id="chat__button" >
+              <svg width="24" height="24" xmlns="http://www.w3.org/2000/svg" fillRule="evenodd" fill="#ede0e0" clipRule="evenodd">
+              <path d="M24 20h-3v4l-5.333-4h-7.667v-4h2v2h6.333l2.667 2v-2h3v-8.001h-2v-2h4v12.001zm-15.667-6l-5.333 4v-4h-3v-14.001l18 .001v14h-9.667zm-6.333-2h3v2l2.667-2h8.333v-10l-14-.001v10.001z" />
+              </svg>
+            </button>
+          </a>
 
         </div>
       </header>

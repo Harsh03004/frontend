@@ -13,7 +13,7 @@ const ClassPage = () => {
   const [owner, setOwner] = useState(null);
   const messagesEndRef = useRef(null);
   const socketRef = useRef(null);
-  const [members, setMembers] = useState([]); 
+  const [members, setMembers] = useState([]);
   const [messages, setMessages] = useState([]);
 
   const { classId, organisationId } = useParams();
@@ -26,7 +26,7 @@ const ClassPage = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-  
+
   const handleGoBack = () => {
     navigate(-1);
   };
@@ -35,25 +35,25 @@ const ClassPage = () => {
     const socket = io("http://localhost:3000", {
       withCredentials: true,
     });
-  
+
     socketRef.current = socket;
-  
+
     socket.on("connect", () => {
       console.log("Connected to socket:", socket.id);
       socket.emit("joinClass", classId);
     });
-  
+
     // Listen for incoming new messages and update the messages state
     socket.on("newMessage", (message) => {
       console.log("Received new message:", message); // Debug log to see if it's being received
       setMessages((prevMessages) => [...prevMessages, message]); // Add new message to state
     });
-  
+
     return () => {
       socket.disconnect();
     };
   }, [classId]);
-  
+
   // Fetch members and class data
   const fetchClassData = async () => {
     try {
@@ -64,11 +64,16 @@ const ClassPage = () => {
       });
 
       if (res.data?.data) {
-        setClassData(res.data.data);
+        await setClassData(res.data.data);
+        console.log("Class Data:", res.data);
         console.log(res.data);
         setMembers(res.data.data.students || []);
+        console.log(res.data.data.students);
+
         setOwner(res.data.data.owner || null);
-        
+        console.log(res.data.data.owner);
+
+
       }
     } catch (err) {
       console.error("Error fetching class data:", err);
@@ -92,14 +97,14 @@ const ClassPage = () => {
   };
 
 
-  
+
   const handleSendMessage = async (e) => {
     e.preventDefault();
     if (chatInput.trim()) {
       await sendMessage();
     }
   };
-  
+
 
   const sendMessage = async () => {
     try {
@@ -109,7 +114,7 @@ const ClassPage = () => {
         classId,
         createdAt: new Date(),
       };
-  
+
       // Send HTTP POST request to save message
       const res = await fetch(`http://localhost:3000/api/v1/messages/${classId}/send`, {
         method: "POST",
@@ -119,31 +124,31 @@ const ClassPage = () => {
         },
         body: JSON.stringify({ text: chatInput.trim() }),
       });
-  
+
       const message = await res.json();
-  
+
       // Emit the socket event with message.data
       if (socketRef.current) {
         socketRef.current.emit("sendMessage", message);
       }
-  
+
       setChatInput(""); // Clear input
     } catch (err) {
       console.error("Error sending message:", err);
     }
-    
+
   };
 
   useEffect(() => {
     if (classId) {
       fetchClassData();
       getMessages();
-  
+
       // Set up interval to fetch messages every 5 seconds
       // const intervalId = setInterval(() => {
       //   getMessages();
       // }, 1000);
-  
+
       // Clear interval on component unmount
       // return () => clearInterval(intervalId);
     }
@@ -165,12 +170,12 @@ const ClassPage = () => {
             <h1 className="text-2xl font-bold">{classData?.name || "Loading..."}</h1>
           </div>
           <div className="flex-none flex gap-4">
-          <button
-        onClick={handleGoBack}
-        className="btn btn-secondary"
-          >
-        Go Back
-        </button>
+            <button
+              onClick={handleGoBack}
+              className="btn btn-secondary"
+            >
+              Go Back
+            </button>
             <button
               onClick={() => setShowInviteForm(!showInviteForm)}
               className="btn btn-primary"
@@ -178,19 +183,19 @@ const ClassPage = () => {
               {showInviteForm ? "Close" : "Invite Member"}
             </button>
             <button
-  onClick={() => {
-    if (organisationId && classData?.name) {
-      // Ensure organisationId and classData.name are valid
-      const roomName = `${classData.orgName}-${classData.name}`.replace(/\s+/g, "-").toLowerCase();
-      navigate(`/room?room=${roomName}`);
-    } else {
-      console.error("Organisation ID or Class Name is missing.");
-    }
-  }}
-  className="btn btn-accent"
->
-  Go to Room
-</button>
+              onClick={() => {
+                if (organisationId && classData?.name) {
+                  // Ensure organisationId and classData.name are valid
+                  const roomName = `${classData.orgName}-${classData.name}`.replace(/\s+/g, "-").toLowerCase();
+                  navigate(`/room?room=${roomName}`);
+                } else {
+                  console.error("Organisation ID or Class Name is missing.");
+                }
+              }}
+              className="btn btn-accent"
+            >
+              Go to Room
+            </button>
           </div>
         </div>
 
