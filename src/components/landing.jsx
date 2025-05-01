@@ -1,7 +1,18 @@
 import React from 'react';
 import { Video, Users, Shield, Calendar, ArrowRight, Globe2, Zap, MessageSquare } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom'
+
 function Landing() {
+  let navigate = useNavigate();
+  const handleStartMeeting = () => {
+    const randomRoomId = Math.floor(100000 + Math.random() * 900000); // generates 6-digit number
+    navigate(`/room?room=${randomRoomId}`);
+  };
+
+  const handleJoinMeeting = () =>{
+    navigate('/lobby');
+  }
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
 
@@ -17,15 +28,19 @@ function Landing() {
               Experience crystal-clear video meetings, real-time collaboration, and secure communication all in one powerful platform.
             </p>
             <div className="flex gap-4">
-              <a href="localhost:5173/room?room=123" target='_blank'>
-                <button className="px-8 py-4 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition flex items-center gap-2">
+              <a >
+                <button className="px-8 py-4 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition flex items-center gap-2" onClick={handleStartMeeting}>
                   Get Started Instant Meeting <ArrowRight size={20} />
                 </button>
               </a>
-              <button className="px-8 py-4 border-2 border-gray-300 text-gray-700 rounded-lg font-semibold hover:border-gray-400 transition">
-                View Demo
+              <button className="px-8 py-4 border-2 border-gray-300 text-gray-700 rounded-lg font-semibold hover:border-gray-400 transition" onClick={handleJoinMeeting}>
+                Join Meeting
               </button>
             </div>
+
+          
+
+
           </div>
           <div className="md:w-1/2">
             <img
