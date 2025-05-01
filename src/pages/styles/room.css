@@ -20,6 +20,14 @@
   position: fixed;
   height: 100%;
   z-index: 999;
+  transform: translateX(-100%);
+  transition: transform 0.3s ease-in-out;
+  visibility: hidden;
+}
+
+#members__container.active {
+  transform: translateX(0);
+  visibility: visible;
 }
 
 #members__count {
@@ -82,6 +90,26 @@
   max-width: 25rem;
   overflow-y: auto;
   border-left: 1px solid #111;
+  transform: translateX(100%);
+  transition: transform 0.3s ease-in-out;
+  visibility: hidden;
+}
+
+#messages__container.active {
+  transform: translateX(0);
+  visibility: visible;
+}
+
+@media (max-width: 980px) {
+  #messages__container {
+    width: 100%;
+    max-width: 100%;
+    transform: translateY(100%);
+  }
+  
+  #messages__container.active {
+    transform: translateY(0);
+  }
 }
 
 #messages {
@@ -173,6 +201,11 @@
   top: clac(100vh - 72px);
   overflow-y: auto;
   height: 100%;
+  transition: margin-left 0.3s ease-in-out;
+}
+
+#stream__container.shifted {
+  margin-left: 250px;
 }
 
 #stream__box{
