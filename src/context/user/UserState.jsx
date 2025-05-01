@@ -61,7 +61,7 @@ const UserState = (props) => {
                 // connectSocket(json.data.user._id); // Connect to socket with user ID
                 props.showAlert("Login successfully", "success")
                 toast.success("Login successfully")
-                navigate("/home/profile");
+                navigate("/home");
             }
             else {
                 props.showAlert("Invalid credentials", "danger")
@@ -154,7 +154,7 @@ const UserState = (props) => {
         }
     };
 
-    const checkRefreshToken =  async (pathOfPage)=>{
+    const checkRefreshToken =  async ()=>{
         try {
             const response = await fetch(`${host}api/v1/users/refreshToken`, {
               method: 'POST',
@@ -172,7 +172,7 @@ const UserState = (props) => {
               console.log("------------------")
               console.log("access token= "+json.data.accessToken);
               if(json.data.accessToken===undefined){
-                navigate(`${pathOfPage}`);
+                navigate("/login");
                 return;
               }
               localStorage.setItem('accessToken', json.data.accessToken);
