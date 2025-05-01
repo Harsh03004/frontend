@@ -1,8 +1,3 @@
-
-
-
-
-
 import React, { useState, useRef, useEffect, useContext } from "react";
 import { io } from "socket.io-client";
 import { useParams, useNavigate } from "react-router-dom";
@@ -155,14 +150,14 @@ const ClassPage = () => {
       getMessages();
   
       // Set up interval to fetch messages every 5 seconds
-      const intervalId = setInterval(() => {
-        getMessages();
-      }, 1000);
+      // const intervalId = setInterval(() => {
+      //   getMessages();
+      // }, 1000);
   
       // Clear interval on component unmount
-      return () => clearInterval(intervalId);
+      // return () => clearInterval(intervalId);
     }
-  }, [classId]);
+  }, [classId, socketRef, chatInput, setChatInput]);
 
   const handleInvite = async (e) => {
     e.preventDefault();
