@@ -3,6 +3,8 @@ import { useNavigate } from "react-router-dom"; // Import useNavigate
 import { Plus, X } from "lucide-react";
 import organisationContext from "../context/organisations/organisationContext";
 import ClassesContext from "../context/classes/classesContext";
+import userContext from "../context/user/userContext";
+
 
 
 const Organisation = () => {
@@ -18,6 +20,27 @@ const Organisation = () => {
   const [shouldFetch, setShouldFetch] = useState(true);
 
   const navigate = useNavigate(); // Initialize useNavigate
+
+
+  const { id, updateAvatar, checkRefreshToken, userDetail } = useContext(userContext);
+
+  const checkAndRefreshToken = async () => {
+    const accessToken = localStorage.getItem("accessToken");
+    if (accessToken && accessToken !== undefined) {
+      await userDetail();
+      return;
+    }
+    checkRefreshToken();
+  };
+
+  const hasRun = useRef(false);
+  useEffect(() => {
+    if (!hasRun.current) {
+      hasRun.current = true;
+      checkAndRefreshToken();
+    }
+    // eslint-disable-next-line
+  }, []);
 
   const hasFetched = useRef(false); // 👈 this is the important line
 

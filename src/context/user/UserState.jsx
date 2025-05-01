@@ -61,7 +61,7 @@ const UserState = (props) => {
                 // connectSocket(json.data.user._id); // Connect to socket with user ID
                 props.showAlert("Login successfully", "success")
                 toast.success("Login successfully")
-                navigate("/home");
+                navigate("/home/profile");
             }
             else {
                 props.showAlert("Invalid credentials", "danger")

@@ -2,7 +2,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate} from "react-router-do
 import React, { useState } from 'react';
 import Profile from "./pages/Profile";
 import Chat from "./components/chat";
-import HomePage from "./pages/HomePage";
+import HomePage from "./pages/homePage";
 import Alert from "./components/Alert";
 import UserState from "./context/user/UserState";
 import ForgotPassword from "./components/ForgotPassword"
@@ -18,6 +18,10 @@ import Classes from "./components/classes.jsx";
 import ClassPage from "./pages/classPage.jsx";
 import Organisation from "./components/organisation.jsx";
 import Invite from "./components/invite.jsx";
+
+import Room from "./pages/Room.jsx"
+
+
 function App() {
 
 
@@ -52,8 +56,11 @@ function App() {
               <Route path="/login" element={!userId ? <LoginPage showAlert = {showAlert} /> : <Navigate to="/" />} />
               <Route exact path="/register" element ={<RegisterPage />} />
               <Route exact path="/forgotPassword" element={<ForgotPassword showAlert={showAlert} />} />
+          <Route exact path="/room" element={<Room />} />
+
               {/* <Route exact path="/chat" element={<Chat />} /> */}
               {/* <Route path="/organisation/:organisationId/classes" element={<Classes />} /> */}
+
 
               <Route path="/home" element={<HomePage />} >
                 <Route exact path="organisation" element={<Organisation showAlert={showAlert} />} />

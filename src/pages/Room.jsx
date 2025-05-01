@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom'
 import userContext from "../context/user/userContext";
 import './styles/main.css';
 import './styles/room.css';
+import { MdAddComment } from 'react-icons/md';
 
 const Room = () => {
   const APP_ID = "53bd41defce64a9eb9b17038c118ed3f";
@@ -17,7 +18,7 @@ const Room = () => {
       await userDetail();
       return;
     }
-    await checkRefreshToken("/lobby");
+    await checkRefreshToken();
   };
 
   const hasRun = useRef(false);
@@ -58,43 +59,9 @@ const Room = () => {
 
 
 
-  // useEffect(() => {
-  //   const hasJoined = useRef(false);
-  
-  //   const joinRoomInit = async () => {
-  //     if (hasJoined.current) return; // Prevent multiple joins
-  //     hasJoined.current = true;
-  
-  //     try {
-  //       await client.join(APP_ID, roomId, null, id);
-  //       client.on('user-published', handleUserPublished);
-  //       client.on('user-left', handleUserLeft);
-  //       await joinStream();
-  //     } catch (error) {
-  //       console.error('Error joining room:', error);
-  //       hasJoined.current = false; // Allow retry on failure
-  //     }
-  //   };
-  
-  //   joinRoomInit();
-  
-  //   return () => {
-  //     localTracksRef.current.forEach(track => track && track.close());
-  //     client.leave();
-  //   };
-  // }, [client, roomId, id]);
 
 
   useEffect(() => {
-    // if (!displayName) {
-    //   navigate('/lobby'); // Use navigate instead of window.location
-    //   return;
-    // }
-
-    // if (!hasRun.current) {
-    //   hasRun.current = true;
-    //   checkAndRefreshToken();
-    // }
 
     if (messagesContainerRef.current) {
       messagesContainerRef.current.scrollTop = messagesContainerRef.current.scrollHeight;
@@ -145,6 +112,7 @@ const Room = () => {
       localTracksRef.current = localTracks;
       console.log("user id", id);
       addVideoPlayer(id);
+      // addMemberList(id);
       localTracks[1].play(`user-${id}`);
       await client.publish(localTracks);
     } catch (error) {
@@ -162,6 +130,20 @@ const Room = () => {
     `;
     streamsContainerRef.current.insertAdjacentHTML('beforeend', playerHTML);
     document.getElementById(`user-container-${userId}`).addEventListener('click', expandVideoFrame);
+  };
+
+  // ------------------------------------------------------------------------------------
+  const addMemberList = (userId) => {
+    // if (!memberContainerRef.current) return;
+
+    const playerHTML = `
+      <div className="member__wrapper" id="member__${userId}__wrapper">
+        <span className="green__icon"></span>
+        <p className="member_name">${userId}</p>
+      </div>
+    `;
+    memberContainerRef.current.insertAdjacentHTML('beforeend', playerHTML);
+    // document.getElementById(`user-container-${userId}`);
   };
 
   const switchToCamera = async () => {
@@ -183,6 +165,9 @@ const Room = () => {
     if (!document.getElementById(`user-container-${user.id}`)) {
       addVideoPlayer(user.id);
     }
+    // if (!document.getElementById(`member__${userId}__wrapper`)) {
+    //   addMemberList(user.id);
+    // }
 
     if (displayFrameRef.current?.style.display === 'block') {
       const videoFrame = document.getElementById(`user-container-${user.id}`);
@@ -246,8 +231,13 @@ const Room = () => {
       try {
         setSharingScreen(true);
         screenButton.classList.add('active');
-        cameraButton.classList.add('inactive');
-        cameraButton.style.display = 'none';
+        // cameraButton.classList.add('inactive');
+        // cameraButton.style.display = 'none';
+
+        // toggleCamera();
+        // const videoTrack = localTracksRef.current[1];
+        // await videoTrack.setMuted(true);
+        // button.classList.remove('active');
 
         localScreenTrackRef.current = await AgoraRTC.createScreenVideoTrack();
         document.getElementById(`user-container-${id}`)?.remove();
@@ -271,6 +261,7 @@ const Room = () => {
         setSharingScreen(false);
       }
     } else {
+      // button.classList.add('active');
       setSharingScreen(false);
       cameraButton.style.display = 'block';
       screenButton.classList.remove('active');
@@ -333,7 +324,7 @@ const Room = () => {
 
   const handleLeave = async () => {
     await client.leave();
-  localTracksRef.current.forEach(track => track && track.close());
+    localTracksRef.current.forEach(track => track && track.close());
     navigate('/lobby'); // Use navigate instead of window.location
   };
 
@@ -349,7 +340,7 @@ const Room = () => {
           </button>
           <a href="/lobby">
             <h3 id="logo">
-              <img src="C:\Users\Dell\Desktop\minor2\frontend\src\assets\images\logo.png" alt="Site Logo" />
+              <img src="..\assets\images\logo.png" alt="Site Logo" />
               <span>StuMeet</span>
             </h3>
           </a>
@@ -361,12 +352,7 @@ const Room = () => {
               <path d="M24 20h-3v4l-5.333-4h-7.667v-4h2v2h6.333l2.667 2v-2h3v-8.001h-2v-2h4v12.001zm-15.667-6l-5.333 4v-4h-3v-14.001l18 .001v14h-9.667zm-6.333-2h3v2l2.667-2h8.333v-10l-14-.001v10.001z" />
             </svg>
           </button>
-          <a className="nav__link" id="create__room__btn" href="/lobby">
-            Create Room
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="#ede0e0" viewBox="0 0 24 24">
-              <path d="M12 0c-6.627 0-12 5.373-12 12s5.373 12 12 12 12-5.373 12-12-5.373-12-12-12zm6 13h-5v5h-2v-5h-5v-2h5v-5h2v5h5v2z" />
-            </svg>
-          </a>
+          
         </div>
       </header>
 
