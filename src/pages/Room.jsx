@@ -10,6 +10,7 @@ const Room = () => {
   const APP_ID = "53bd41defce64a9eb9b17038c118ed3f";
 
   const { id, updateAvatar, checkRefreshToken, userDetail } = useContext(userContext);
+  const [userDetails, setUserDetails] = useState({});
 
   let navigate = useNavigate();
   const checkAndRefreshToken = async () => {
@@ -31,6 +32,17 @@ const Room = () => {
     // eslint-disable-next-line
   }, []);
 
+  useEffect(() => {
+    const getUserInfo = async () => {
+      try {
+        const info = await userDetail();
+        setUserDetails(info);
+      } catch (error) {
+        console.error('Error getting user info:', error);
+      }
+    };
+    getUserInfo();
+  }, []);
 
   const [roomId] = useState(() => {
     const urlParam = new URLSearchParams(window.location.search);
@@ -56,10 +68,48 @@ const Room = () => {
   const [activeMemberContainer, setActiveMemberContainer] = useState(false);
   const [activeChatContainer, setActiveChatContainer] = useState(false);
   const [userIdInDisplayFrame, setUserIdInDisplayFrame] = useState(null);
+  const [roomMembers, setRoomMembers] = useState([]);
 
+  // Add function to fetch multiple user details
+  const fetchMultipleUserDetails = async (userIds) => {
+    try {
+      const accessToken = localStorage.getItem("accessToken");
+      console.log("Fetching details for user IDs:", userIds);
 
+      const response = await fetch(`http://localhost:3000/api/v1/users/getMultipleUsers`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${accessToken}`
+        },
+        body: JSON.stringify({
+          userIds: userIds
+        })
+      });
+      
+      console.log("Response status:", response.status);
+      const responseData = await response.json();
+      console.log("Full response data:", responseData);
 
-
+      if (response.ok && responseData.success) {
+        const usersData = responseData.data;
+        console.log("Users data received:", usersData);
+        
+        // Update userDetails state with all received user data
+        setUserDetails(prev => ({
+          ...prev,
+          ...usersData
+        }));
+        return usersData;
+      } else {
+        console.error("Error response:", responseData);
+        return null;
+      }
+    } catch (error) {
+      console.error('Error fetching user details:', error);
+      return null;
+    }
+  };
 
   useEffect(() => {
 
@@ -110,9 +160,9 @@ const Room = () => {
         },
       });
       localTracksRef.current = localTracks;
-      console.log("user id", id);
+      console.log("Joining stream with user id:", id);
       addVideoPlayer(id);
-      // addMemberList(id);
+      await addMemberList(id);
       localTracks[1].play(`user-${id}`);
       await client.publish(localTracks);
     } catch (error) {
@@ -130,20 +180,58 @@ const Room = () => {
     `;
     streamsContainerRef.current.insertAdjacentHTML('beforeend', playerHTML);
     document.getElementById(`user-container-${userId}`).addEventListener('click', expandVideoFrame);
+    
   };
 
   // ------------------------------------------------------------------------------------
-  const addMemberList = (userId) => {
-    // if (!memberContainerRef.current) return;
+  const addMemberList = async (userId) => {
+    if (!memberContainerRef.current) return;
 
-    const playerHTML = `
-      <div className="member__wrapper" id="member__${userId}__wrapper">
-        <span className="green__icon"></span>
-        <p className="member_name">${userId}</p>
+    console.log("Adding member:", userId);
+    console.log("Current userDetails state:", userDetails);
+
+    // Get all current user IDs that need details
+    const userIdsToFetch = [userId];
+    if (!userDetails[userId]) {
+      const fetchedData = await fetchMultipleUserDetails(userIdsToFetch);
+      console.log("Fetched data for user:", fetchedData);
+    }
+
+    // Get the fullname from userDetails or use a default
+    const userData = userDetails[userId];
+    console.log("User data for display:", userData);
+    const fullname = userData?.fullname || userId;
+    console.log("Final fullname to display:", fullname);
+
+    const memberHTML = `
+      <div class="member__wrapper" id="member__${userId}__wrapper">
+        <span class="green__icon"></span>
+        <p class="member_name">${fullname}</p>
       </div>
     `;
-    memberContainerRef.current.insertAdjacentHTML('beforeend', playerHTML);
-    // document.getElementById(`user-container-${userId}`);
+    
+    const memberList = memberContainerRef.current.querySelector('#member__list');
+    if (memberList) {
+      // Remove existing member if present
+      const existingMember = document.getElementById(`member__${userId}__wrapper`);
+      if (existingMember) {
+        existingMember.remove();
+      }
+      memberList.insertAdjacentHTML('beforeend', memberHTML);
+    }
+    
+    // Update room members state
+    setRoomMembers(prev => [...prev, userId]);
+  };
+
+  const removeMemberList = (userId) => {
+    const memberElement = document.getElementById(`member__${userId}__wrapper`);
+    if (memberElement) {
+      memberElement.remove();
+    }
+    
+    // Update room members state
+    setRoomMembers(prev => prev.filter(member => member !== userId));
   };
 
   const switchToCamera = async () => {
@@ -162,15 +250,20 @@ const Room = () => {
     remoteUsersRef.current[user.id] = user;
     await client.subscribe(user, mediaType);
 
-    if (!document.getElementById(`user-container-${user.id}`)) {
-      addVideoPlayer(user.id);
+    // Get the actual user ID from the user's metadata or custom data
+    const actualUserId = user.uid || user.id; // Use uid if available, otherwise fallback to id
+
+    if (!document.getElementById(`user-container-${actualUserId}`)) {
+      addVideoPlayer(actualUserId);
     }
-    // if (!document.getElementById(`member__${userId}__wrapper`)) {
-    //   addMemberList(user.id);
-    // }
+    
+    // Add member to list with fetched user details
+    if (!document.getElementById(`member__${actualUserId}__wrapper`)) {
+      await addMemberList(actualUserId);
+    }
 
     if (displayFrameRef.current?.style.display === 'block') {
-      const videoFrame = document.getElementById(`user-container-${user.id}`);
+      const videoFrame = document.getElementById(`user-container-${actualUserId}`);
       if (videoFrame) {
         videoFrame.style.height = '100px';
         videoFrame.style.width = '100px';
@@ -178,7 +271,7 @@ const Room = () => {
     }
 
     if (mediaType === 'video') {
-      user.videoTrack.play(`user-${user.id}`);
+      user.videoTrack.play(`user-${actualUserId}`);
     }
     if (mediaType === 'audio') {
       user.audioTrack.play();
@@ -186,11 +279,15 @@ const Room = () => {
   };
 
   const handleUserLeft = (user) => {
-    delete remoteUsersRef.current[user.id];
-    const userContainer = document.getElementById(`user-container-${user.id}`);
+    const actualUserId = user.uid || user.id;
+    delete remoteUsersRef.current[actualUserId];
+    const userContainer = document.getElementById(`user-container-${actualUserId}`);
     if (userContainer) userContainer.remove();
 
-    if (userIdInDisplayFrame === `user-container-${user.id}`) {
+    // Remove member from list
+    removeMemberList(actualUserId);
+
+    if (userIdInDisplayFrame === `user-container-${actualUserId}`) {
       hideDisplayFrame();
     }
   };
@@ -361,21 +458,10 @@ const Room = () => {
           <section id="members__container" ref={memberContainerRef} className={activeMemberContainer ? 'active' : ''}>
             <div id="members__header">
               <p>Participants</p>
-              <strong id="members__count">27</strong>
+              <strong id="members__count">{roomMembers.length}</strong>
             </div>
             <div id="member__list">
-              <div className="member__wrapper" id="member__1__wrapper">
-                <span className="green__icon"></span>
-                <p className="member_name">Sulammita</p>
-              </div>
-              <div className="member__wrapper" id="member__2__wrapper">
-                <span className="green__icon"></span>
-                <p className="member_name">Dennis Ivy</p>
-              </div>
-              <div className="member__wrapper" id="member__3__wrapper">
-                <span className="green__icon"></span>
-                <p className="member_name">Shahriar P. Shuvo 👋</p>
-              </div>
+              {/* Members will be added dynamically */}
             </div>
           </section>
 
