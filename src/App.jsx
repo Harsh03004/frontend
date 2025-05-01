@@ -20,7 +20,6 @@ import Organisation from "./components/organisation.jsx";
 import Invite from "./components/invite.jsx";
 import LobbyPage from "./pages/Lobby.jsx";
 import Room from "./pages/Room.jsx"
-import LobbyPage from "./pages/Lobby.jsx"
 
 
 function App() {
