@@ -28,11 +28,14 @@ function Landing() {
               Experience crystal-clear video meetings, real-time collaboration, and secure communication all in one powerful platform.
             </p>
             <div className="flex gap-4">
-              <a >
-                <button className="px-8 py-4 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition flex items-center gap-2" onClick={handleStartMeeting}>
+
+              <a href={`http://localhost:5173/room?room=${Math.floor(10000 + Math.random() * 90000)}`} target='_blank'>
+                <button className="px-8 py-4 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition flex items-center gap-2">
                   Get Started Instant Meeting <ArrowRight size={20} />
                 </button>
               </a>
+
+
               <button className="px-8 py-4 border-2 border-gray-300 text-gray-700 rounded-lg font-semibold hover:border-gray-400 transition" onClick={handleJoinMeeting}>
                 Join Meeting
               </button>
