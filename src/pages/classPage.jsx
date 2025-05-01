@@ -15,6 +15,7 @@ const ClassPage = () => {
   const [inviteName, setInviteName] = useState("");
   const [chatInput, setChatInput] = useState("");
   const [showInviteForm, setShowInviteForm] = useState(false);
+  const [owner, setOwner] = useState(null);
   const messagesEndRef = useRef(null);
   const socketRef = useRef(null);
   const [members, setMembers] = useState([]); 
@@ -30,6 +31,20 @@ const ClassPage = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
+  // useEffect(() => {
+  //   if (classId) {
+  //     fetchClassData();
+  //     getMessages();
+  
+  //     // Set up interval to fetch messages every 5 seconds
+  //     const intervalId = setInterval(() => {
+  //       getMessages();
+  //     }, 5);
+  
+  //     // Clear interval on component unmount
+  //     return () => clearInterval(intervalId);
+  //   }
+  // }, [classId]);
 
 
   useEffect(() => {
@@ -67,6 +82,8 @@ const ClassPage = () => {
       if (res.data?.data) {
         setClassData(res.data.data);
         setMembers(res.data.data.students || []);
+        setOwner(res.data.data.owner || null);
+        
       }
     } catch (err) {
       console.error("Error fetching class data:", err);
@@ -108,7 +125,7 @@ const ClassPage = () => {
         createdAt: new Date(),
       };
   
-      // Only emit, don't optimistically add it to UI
+      // Send HTTP POST request to save message
       const res = await fetch(`http://localhost:3000/api/v1/messages/${classId}/send`, {
         method: "POST",
         headers: {
@@ -120,6 +137,7 @@ const ClassPage = () => {
   
       const message = await res.json();
   
+      // Emit the socket event with message.data
       if (socketRef.current) {
         socketRef.current.emit("sendMessage", message.data);
       }
@@ -128,12 +146,21 @@ const ClassPage = () => {
     } catch (err) {
       console.error("Error sending message:", err);
     }
+    
   };
 
   useEffect(() => {
     if (classId) {
       fetchClassData();
       getMessages();
+  
+      // Set up interval to fetch messages every 5 seconds
+      const intervalId = setInterval(() => {
+        getMessages();
+      }, 1000);
+  
+      // Clear interval on component unmount
+      return () => clearInterval(intervalId);
     }
   }, [classId]);
 
@@ -213,9 +240,35 @@ const ClassPage = () => {
 
       <div className="w-80 flex flex-col border-l border-base-300 bg-base-100">
         <div className="p-4 bg-base-100 shadow-md text-lg font-semibold">
-          Members ({Array.isArray(members) ? members.length : 0})
+          Members ({Array.isArray(members) ? members.length + (owner ? 1 : 0) : 0})
         </div>
         <div className="flex-1 overflow-y-auto p-4 space-y-3">
+          {owner && (
+            <div className="flex items-center gap-3 p-3 bg-base-200 rounded-lg shadow hover:bg-base-300 transition">
+              <div className="avatar placeholder">
+                <div className="bg-primary text-primary-content rounded-full w-10 h-10">
+                  {owner?.avatar ? (
+                    <img
+                      src={owner.avatar}
+                      alt="Owner Avatar"
+                      className="rounded-full w-10 h-10"
+                    />
+                  ) : (
+                    <span className="text-lg font-bold">
+                      {owner?.username?.[0]?.toUpperCase() || "?"}
+                    </span>
+                  )}
+                </div>
+              </div>
+              <div className="flex flex-col">
+                <span className="font-medium">
+                  {owner?.username || "Unknown"}
+                </span>
+                <span className="text-sm text-gray-500">Owner</span>
+              </div>
+            </div>
+          )}
+
           {Array.isArray(members) && members.length === 0 ? (
             <div className="text-center">No members in this class</div>
           ) : (
@@ -227,7 +280,11 @@ const ClassPage = () => {
                 <div className="avatar placeholder">
                   <div className="bg-primary text-primary-content rounded-full w-10 h-10">
                     {member?.user?.avatar ? (
-                      <img src={member.user.avatar} alt="Avatar" className="rounded-full w-10 h-10" />
+                      <img
+                        src={member.user.avatar}
+                        alt="Avatar"
+                        className="rounded-full w-10 h-10"
+                      />
                     ) : (
                       <span className="text-lg font-bold">
                         {member?.user?.username?.[0]?.toUpperCase() || "?"}
@@ -235,7 +292,9 @@ const ClassPage = () => {
                     )}
                   </div>
                 </div>
-                <span className="font-medium">{member?.user?.username || "Unknown"}</span>
+                <span className="font-medium">
+                  {member?.user?.username || "Unknown"}
+                </span>
               </div>
             ))
           )}
@@ -244,5 +303,9 @@ const ClassPage = () => {
     </div>
   );
 };
-
 export default ClassPage;
+
+
+
+
+
