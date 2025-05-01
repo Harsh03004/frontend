@@ -134,7 +134,7 @@ function Profile() {
       await userDetail();
       return;
     }
-    await checkRefreshToken();
+    checkRefreshToken();
   };
 
   const hasRun = useRef(false);

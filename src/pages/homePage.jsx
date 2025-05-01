@@ -40,6 +40,7 @@
 // pages/HomeLayout.jsx
 import { Outlet, useNavigate } from "react-router-dom";
 import Sidebar from "../components/sidebar";
+// import Navbar from "../components/navbar";
 
 function HomeLayout() {
   const navigate = useNavigate();
@@ -49,12 +50,15 @@ function HomeLayout() {
   };
 
   return (
+    <>
+    {/* <Navbar /> */}
     <div className="flex">
       <Sidebar setActivePage={handlePageChange} />
       <div className="w-full">
         <Outlet />
       </div>
     </div>
+    </>
   );
 }
 
