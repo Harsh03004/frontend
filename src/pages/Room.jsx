@@ -8,13 +8,20 @@ import { MdAddComment } from 'react-icons/md';
 
 const Room = () => {
   const APP_ID = "53bd41defce64a9eb9b17038c118ed3f";
-
-  const { id, updateAvatar, checkRefreshToken, userDetail } = useContext(userContext);
+  const id = localStorage.getItem('display_name');
   const [userDetails, setUserDetails] = useState({});
+
+
+  const { checkRefreshToken, userDetail } = useContext(userContext);
 
   let navigate = useNavigate();
   const checkAndRefreshToken = async () => {
+
     const accessToken = localStorage.getItem("accessToken");
+    if (!id) {
+      navigate('/lobby'); // Use navigate instead of window.location
+      return;
+    }
     if (accessToken && accessToken !== undefined) {
       await userDetail();
       return;
@@ -52,9 +59,10 @@ const Room = () => {
   });
 
   const [profileImage, setProfileImage] = useState(id?.avatar);
-  const [displayName, setdisplayName] = useState(id?.fullname);
+  // const [displayName, setdisplayName] = useState(id?.fullname);
 
   // const displayName = localStorage.getItem('display_name');
+
   const streamsContainerRef = useRef(null);
   const displayFrameRef = useRef(null);
   const messagesContainerRef = useRef(null);
@@ -70,7 +78,6 @@ const Room = () => {
   const [userIdInDisplayFrame, setUserIdInDisplayFrame] = useState(null);
   const [roomMembers, setRoomMembers] = useState([]);
 
-  // Add function to fetch multiple user details
   const fetchMultipleUserDetails = async (userIds) => {
     try {
       const accessToken = localStorage.getItem("accessToken");
@@ -86,7 +93,7 @@ const Room = () => {
           userIds: userIds
         })
       });
-      
+
       console.log("Response status:", response.status);
       const responseData = await response.json();
       console.log("Full response data:", responseData);
@@ -94,7 +101,7 @@ const Room = () => {
       if (response.ok && responseData.success) {
         const usersData = responseData.data;
         console.log("Users data received:", usersData);
-        
+
         // Update userDetails state with all received user data
         setUserDetails(prev => ({
           ...prev,
@@ -111,6 +118,7 @@ const Room = () => {
     }
   };
 
+
   useEffect(() => {
 
     if (messagesContainerRef.current) {
@@ -120,6 +128,7 @@ const Room = () => {
     const joinRoomInit = async () => {
       if (hasJoined.current) return;
       try {
+        await console.log(`idd--------------------->${id}`)
         await client.join(APP_ID, roomId, null, id);
         client.on('user-published', handleUserPublished);
         client.on('user-left', handleUserLeft);
@@ -137,7 +146,7 @@ const Room = () => {
     };
 
 
-  }, [client, roomId]);
+  }, [client, roomId, id]);
 
   useEffect(() => {
     if (displayFrameRef.current) {
@@ -160,7 +169,7 @@ const Room = () => {
         },
       });
       localTracksRef.current = localTracks;
-      console.log("Joining stream with user id:", id);
+      console.log("user id", id);
       addVideoPlayer(id);
       await addMemberList(id);
       localTracks[1].play(`user-${id}`);
@@ -180,7 +189,6 @@ const Room = () => {
     `;
     streamsContainerRef.current.insertAdjacentHTML('beforeend', playerHTML);
     document.getElementById(`user-container-${userId}`).addEventListener('click', expandVideoFrame);
-    
   };
 
   // ------------------------------------------------------------------------------------
@@ -209,7 +217,7 @@ const Room = () => {
         <p class="member_name">${fullname}</p>
       </div>
     `;
-    
+
     const memberList = memberContainerRef.current.querySelector('#member__list');
     if (memberList) {
       // Remove existing member if present
@@ -219,7 +227,7 @@ const Room = () => {
       }
       memberList.insertAdjacentHTML('beforeend', memberHTML);
     }
-    
+
     // Update room members state
     setRoomMembers(prev => [...prev, userId]);
   };
@@ -229,7 +237,7 @@ const Room = () => {
     if (memberElement) {
       memberElement.remove();
     }
-    
+
     // Update room members state
     setRoomMembers(prev => prev.filter(member => member !== userId));
   };
@@ -247,23 +255,23 @@ const Room = () => {
   };
 
   const handleUserPublished = async (user, mediaType) => {
-    remoteUsersRef.current[user.id] = user;
+    remoteUsersRef.current[user] = user.uid;
     await client.subscribe(user, mediaType);
+    console.log("User published:", user);
 
-    // Get the actual user ID from the user's metadata or custom data
-    const actualUserId = user.uid || user.id; // Use uid if available, otherwise fallback to id
+    const actualUserId = user.uid; // Use uid if available, otherwise fallback to id
 
-    if (!document.getElementById(`user-container-${actualUserId}`)) {
-      addVideoPlayer(actualUserId);
+
+    if (!document.getElementById(`user-container-${user.uid}`)) {
+      addVideoPlayer(user.uid);
     }
-    
-    // Add member to list with fetched user details
+
     if (!document.getElementById(`member__${actualUserId}__wrapper`)) {
       await addMemberList(actualUserId);
     }
 
     if (displayFrameRef.current?.style.display === 'block') {
-      const videoFrame = document.getElementById(`user-container-${actualUserId}`);
+      const videoFrame = document.getElementById(`user-container-${user.uid}`);
       if (videoFrame) {
         videoFrame.style.height = '100px';
         videoFrame.style.width = '100px';
@@ -271,7 +279,7 @@ const Room = () => {
     }
 
     if (mediaType === 'video') {
-      user.videoTrack.play(`user-${actualUserId}`);
+      user.videoTrack.play(`user-${user.uid}`);
     }
     if (mediaType === 'audio') {
       user.audioTrack.play();
@@ -279,15 +287,12 @@ const Room = () => {
   };
 
   const handleUserLeft = (user) => {
-    const actualUserId = user.uid || user.id;
-    delete remoteUsersRef.current[actualUserId];
-    const userContainer = document.getElementById(`user-container-${actualUserId}`);
+    delete remoteUsersRef.current[user.uid];
+    const userContainer = document.getElementById(`user-container-${user.uid}`);
     if (userContainer) userContainer.remove();
 
-    // Remove member from list
     removeMemberList(actualUserId);
-
-    if (userIdInDisplayFrame === `user-container-${actualUserId}`) {
+    if (userIdInDisplayFrame === `user-container-${user.uid}`) {
       hideDisplayFrame();
     }
   };
@@ -449,7 +454,7 @@ const Room = () => {
               <path d="M24 20h-3v4l-5.333-4h-7.667v-4h2v2h6.333l2.667 2v-2h3v-8.001h-2v-2h4v12.001zm-15.667-6l-5.333 4v-4h-3v-14.001l18 .001v14h-9.667zm-6.333-2h3v2l2.667-2h8.333v-10l-14-.001v10.001z" />
             </svg>
           </button>
-          
+
         </div>
       </header>
 
@@ -461,7 +466,18 @@ const Room = () => {
               <strong id="members__count">{roomMembers.length}</strong>
             </div>
             <div id="member__list">
-              {/* Members will be added dynamically */}
+              {/* <div className="member__wrapper" id="member__1__wrapper">
+                <span className="green__icon"></span>
+                <p className="member_name">Sulammita</p>
+              </div>
+              <div className="member__wrapper" id="member__2__wrapper">
+                <span className="green__icon"></span>
+                <p className="member_name">Dennis Ivy</p>
+              </div>
+              <div className="member__wrapper" id="member__3__wrapper">
+                <span className="green__icon"></span>
+                <p className="member_name">Shahriar P. Shuvo 👋</p>
+              </div> */}
             </div>
           </section>
 
