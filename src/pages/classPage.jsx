@@ -26,20 +26,7 @@ const ClassPage = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-  // useEffect(() => {
-  //   if (classId) {
-  //     fetchClassData();
-  //     getMessages();
   
-  //     // Set up interval to fetch messages every 5 seconds
-  //     const intervalId = setInterval(() => {
-  //       getMessages();
-  //     }, 5);
-  
-  //     // Clear interval on component unmount
-  //     return () => clearInterval(intervalId);
-  //   }
-  // }, [classId]);
 
 
   useEffect(() => {
@@ -134,7 +121,7 @@ const ClassPage = () => {
   
       // Emit the socket event with message.data
       if (socketRef.current) {
-        socketRef.current.emit("sendMessage", message.data);
+        socketRef.current.emit("sendMessage", message);
       }
   
       setChatInput(""); // Clear input
@@ -157,7 +144,7 @@ const ClassPage = () => {
       // Clear interval on component unmount
       // return () => clearInterval(intervalId);
     }
-  }, [classId, socketRef, chatInput, setChatInput]);
+  }, [classId]);
 
   const handleInvite = async (e) => {
     e.preventDefault();
