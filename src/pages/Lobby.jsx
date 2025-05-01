@@ -1,10 +1,9 @@
-import React, { useEffect, useState } from 'react';
-import { useNavigate, useLocation, Link } from 'react-router-dom'; // Add Link import
+import React, { useContext, useEffect, useRef, useState } from 'react';
+import { useNavigate, useLocation, Link } from 'react-router-dom';
 import './styles/main.css';
 import './styles/lobby.css';
 import logo from '../assets/images/logo.png';
 import userContext from "../context/user/userContext";
-
 
 const LobbyPage = () => {
   const [displayName, setDisplayName] = useState('');
@@ -12,47 +11,45 @@ const LobbyPage = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
+  const { id, checkRefreshToken, userDetail } = useContext(userContext);
 
-    const { id, updateAvatar, checkRefreshToken, userDetail } = useContext(userContext);
-  
-    const checkAndRefreshToken = async () => {
-      const accessToken = localStorage.getItem("accessToken");
-      if (accessToken && accessToken !== undefined) {
-        await userDetail();
-        return;
-      }
-      checkRefreshToken();
-    };
-  
-    const hasRun = useRef(false);
-    useEffect(() => {
-      if (!hasRun.current) {
-        hasRun.current = true;
-        checkAndRefreshToken();
-      }
-      // eslint-disable-next-line
-    }, []);
+  const checkAndRefreshToken = async () => {
+    const accessToken = localStorage.getItem("accessToken");
+    if (accessToken && accessToken !== undefined) {
+      await userDetail();
+      return;
+    }
+    checkRefreshToken();
+  };
+
+  const hasRun = useRef(false);
+  useEffect(() => {
+    if (!hasRun.current) {
+      hasRun.current = true;
+      checkAndRefreshToken();
+    }
+  }, []);
 
   useEffect(() => {
-    const savedName = localStorage.getItem('display_name');
-    if (savedName) {
-      setDisplayName(savedName);
-    }
+    // Log to debug
+    console.log('id from userContext:', id);
+    console.log('Setting displayName to:', id?.fullname || '');
+
+    // Set displayName with fallback to empty string
+    setDisplayName(id?.fullname || '');
 
     const queryParams = new URLSearchParams(location.search);
-    const idFromURL = queryParams.get('room'); // Support both 'id' and 'room'
-
+    const idFromURL = queryParams.get('lobby');
     if (idFromURL) {
       setRoomId(idFromURL);
     }
-  }, [location.search]);
+  }, [location.search, id]); // Add id as a dependency
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (!displayName.trim()) return; // Add basic validation
+    if (!displayName.trim()) return;
 
-    localStorage.setItem('display_name', displayName);
-    const inviteCode = roomId || `room_${Math.floor(Math.random() * 10000)}`; // More unique room ID
+    const inviteCode = roomId || `${Math.floor(Math.random() * 10000)}`;
     navigate(`/room?room=${inviteCode}`);
   };
 

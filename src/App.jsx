@@ -20,6 +20,7 @@ import Organisation from "./components/organisation.jsx";
 import Invite from "./components/invite.jsx";
 
 import Room from "./pages/Room.jsx"
+import LobbyPage from "./pages/Lobby.jsx"
 
 
 function App() {
@@ -56,7 +57,8 @@ function App() {
               <Route path="/login" element={!userId ? <LoginPage showAlert = {showAlert} /> : <Navigate to="/" />} />
               <Route exact path="/register" element ={<RegisterPage />} />
               <Route exact path="/forgotPassword" element={<ForgotPassword showAlert={showAlert} />} />
-          <Route exact path="/room" element={<Room />} />
+              <Route exact path="/room" element={<Room />} />
+              <Route exact path="/lobby" element={<LobbyPage />} />
 
               {/* <Route exact path="/chat" element={<Chat />} /> */}
               {/* <Route path="/organisation/:organisationId/classes" element={<Classes />} /> */}
