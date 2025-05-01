@@ -10,11 +10,7 @@ function RegisterPage()  {
   const [credentials, setCredentials] = useState({name: "", email: "", password: "", username: ""});
 
   const {registerUser} = useContext(userContext)
-//   const [formData, setFormData] = useState({
-//     fullName: "",
-//     email: "",
-//     password: "",
-//   });
+
 
 const handleSubmit = async (e) => {
     e.preventDefault();
@@ -22,18 +18,6 @@ const handleSubmit = async (e) => {
 
   const onChange = (e) => { 
     setCredentials({ ...credentials, [e.target.name]: e.target.value }) };
-
-
-
-//   const validateForm = () => {
-//     if (!formData.fullName.trim()) return toast.error("Full name is required");
-//     if (!formData.email.trim()) return toast.error("Email is required");
-//     if (!/\S+@\S+\.\S+/.test(formData.email)) return toast.error("Invalid email format");
-//     if (!formData.password) return toast.error("Password is required");
-//     if (formData.password.length < 6) return toast.error("Password must be at least 6 characters");
-
-//     return true;
-//   };
 
   return (
     <div className="min-h-screen grid lg:grid-cols-2">
@@ -114,17 +98,7 @@ const handleSubmit = async (e) => {
                   value={credentials.email}
                   onChange={onChange} 
                 />
-                {/* <button
-                  type="button"
-                  className="absolute inset-y-0 right-0 pr-3 flex items-center"
-                  onClick={() => setShowPassword(!showPassword)}
-                >
-                  {showPassword ? (
-                    <EyeOff className="size-5 text-base-content/40" />
-                  ) : (
-                    <Eye className="size-5 text-base-content/40" />
-                  )}
-                </button> */}
+             
               </div>
 
               <div className="form-control">
@@ -148,19 +122,8 @@ const handleSubmit = async (e) => {
                 />
               </div>
             </div>
-            
-
             </div>
-            {/* <button type="submit" className="btn btn-primary w-full" disabled={isSigningUp}>
-              {isSigningUp ? (
-                <>
-                  <Loader2 className="size-5 animate-spin" />
-                  Loading...
-                </>
-              ) : (
-                "Create Account"
-              )}
-            </button> */}
+            
             <button
               type="submit"
               className="btn btn-primary w-full"
