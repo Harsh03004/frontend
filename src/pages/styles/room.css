@@ -28,6 +28,14 @@
 #members__container.active {
   transform: translateX(0);
   visibility: visible;
+  transform: translateX(-100%);
+  transition: transform 0.3s ease-in-out;
+  visibility: hidden;
+}
+
+#members__container.active {
+  transform: translateX(0);
+  visibility: visible;
 }
 
 #members__count {
@@ -100,6 +108,18 @@
 #messages__container.active {
   transform: translateX(0);
   visibility: visible;
+}
+
+@media (max-width: 980px) {
+  #messages__container {
+    width: 100%;
+    max-width: 100%;
+    transform: translateY(100%);
+  }
+  
+  #messages__container.active {
+    transform: translateY(0);
+  }
 }
 
 #messages {

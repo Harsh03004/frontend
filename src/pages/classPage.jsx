@@ -27,7 +27,9 @@ const ClassPage = () => {
   }, [messages]);
 
   
-
+  const handleGoBack = () => {
+    navigate(-1);
+  };
 
   useEffect(() => {
     const socket = io("http://localhost:3000", {
@@ -63,6 +65,7 @@ const ClassPage = () => {
 
       if (res.data?.data) {
         setClassData(res.data.data);
+        console.log(res.data);
         setMembers(res.data.data.students || []);
         setOwner(res.data.data.owner || null);
         
@@ -161,13 +164,33 @@ const ClassPage = () => {
           <div className="flex-1">
             <h1 className="text-2xl font-bold">{classData?.name || "Loading..."}</h1>
           </div>
-          <div className="flex-none">
+          <div className="flex-none flex gap-4">
+          <button
+        onClick={handleGoBack}
+        className="btn btn-secondary"
+          >
+        Go Back
+        </button>
             <button
               onClick={() => setShowInviteForm(!showInviteForm)}
               className="btn btn-primary"
             >
               {showInviteForm ? "Close" : "Invite Member"}
             </button>
+            <button
+  onClick={() => {
+    if (organisationId && classData?.name) {
+      // Ensure organisationId and classData.name are valid
+      const roomName = `${classData.orgName}-${classData.name}`.replace(/\s+/g, "-").toLowerCase();
+      navigate(`/room?room=${roomName}`);
+    } else {
+      console.error("Organisation ID or Class Name is missing.");
+    }
+  }}
+  className="btn btn-accent"
+>
+  Go to Room
+</button>
           </div>
         </div>
 
