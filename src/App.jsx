@@ -17,8 +17,11 @@ import ClassesState from "./context/classes/classesState.jsx";
 import Classes from "./components/classes.jsx"; 
 import ClassPage from "./pages/classPage.jsx";
 import Organisation from "./components/organisation.jsx";
-
 import Invite from "./components/invite.jsx";
+
+import Room from "./pages/Room.jsx"
+
+
 function App() {
 
 
@@ -53,6 +56,8 @@ function App() {
               <Route path="/login" element={!userId ? <LoginPage showAlert = {showAlert} /> : <Navigate to="/" />} />
               <Route exact path="/register" element ={<RegisterPage />} />
               <Route exact path="/forgotPassword" element={<ForgotPassword showAlert={showAlert} />} />
+          <Route exact path="/room" element={<Room />} />
+
               {/* <Route exact path="/chat" element={<Chat />} /> */}
               {/* <Route path="/organisation/:organisationId/classes" element={<Classes />} /> */}
 

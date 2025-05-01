@@ -18,7 +18,7 @@ const Room = () => {
       await userDetail();
       return;
     }
-    await checkRefreshToken("/lobby");
+    await checkRefreshToken();
   };
 
   const hasRun = useRef(false);
@@ -231,8 +231,8 @@ const Room = () => {
       try {
         setSharingScreen(true);
         screenButton.classList.add('active');
-        cameraButton.classList.add('inactive');
-        cameraButton.style.display = 'none';
+        // cameraButton.classList.add('inactive');
+        // cameraButton.style.display = 'none';
 
         // toggleCamera();
         // const videoTrack = localTracksRef.current[1];

@@ -3,12 +3,35 @@ import { useNavigate, useLocation, Link } from 'react-router-dom'; // Add Link i
 import './styles/main.css';
 import './styles/lobby.css';
 import logo from '../assets/images/logo.png';
+import userContext from "../context/user/userContext";
+
 
 const LobbyPage = () => {
   const [displayName, setDisplayName] = useState('');
   const [roomId, setRoomId] = useState('');
   const navigate = useNavigate();
   const location = useLocation();
+
+
+    const { id, updateAvatar, checkRefreshToken, userDetail } = useContext(userContext);
+  
+    const checkAndRefreshToken = async () => {
+      const accessToken = localStorage.getItem("accessToken");
+      if (accessToken && accessToken !== undefined) {
+        await userDetail();
+        return;
+      }
+      checkRefreshToken();
+    };
+  
+    const hasRun = useRef(false);
+    useEffect(() => {
+      if (!hasRun.current) {
+        hasRun.current = true;
+        checkAndRefreshToken();
+      }
+      // eslint-disable-next-line
+    }, []);
 
   useEffect(() => {
     const savedName = localStorage.getItem('display_name');
