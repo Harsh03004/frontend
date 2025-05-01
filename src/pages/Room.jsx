@@ -338,9 +338,9 @@ const Room = () => {
               <path d="M24 19h-24v-1h24v1zm0-6h-24v-1h24v1zm0-6h-24v-1h24v1z" />
             </svg>
           </button>
-          <a href="/lobby">
+          <a href="/">
             <h3 id="logo">
-              <img src="..\assets\images\logo.png" alt="Site Logo" />
+              {/* <img src="..\assets\images\logo.png" alt="Site Logo" /> */}
               <span>StuMeet</span>
             </h3>
           </a>
