@@ -52,7 +52,9 @@ const LobbyPage = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+
     if (!displayName.trim()) return;
+    localStorage.setItem('display_name', displayName);
 
     const inviteCode = roomId || `${Math.floor(Math.random() * 10000)}`;
     navigate(`/room?room=${inviteCode}`);
