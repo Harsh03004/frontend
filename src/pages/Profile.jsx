@@ -1,133 +1,76 @@
-// import React, { useContext, useEffect, useRef, useState } from "react";
-// import { useNavigate } from 'react-router-dom';
-
-// import userContext from '../context/user/userContext';
-// import Navbar from "../components/navbar";
-
-// function Profile() {
-//   const { id, updateAvatar, checkRefreshToken, userDetail } = useContext(userContext);
-
-
-//   let navigate = useNavigate();
-//   const checkAndRefreshToken = async () => {
-//     const accessToken = localStorage.getItem('accessToken');
-//     if (accessToken && accessToken !== undefined) {
-//       userDetail();
-//       return;
-//     }
-//     checkRefreshToken();
-//   };
-
-
-//   const hasRun = useRef(false);
-//   // work like documentdidmount
-//   useEffect(() => {
-//     if (!hasRun.current) {
-//       hasRun.current = true;
-//       checkAndRefreshToken();
-//     }
-//     // eslint-disable-next-line
-//   }, []);
-
-
-
-//   const [profileImage, setProfileImage] = useState(id?.avatar);
-//   useEffect(() => {
-//     console.log("Updating profileImage:", id.avatar);
-//     setProfileImage(id.avatar);
-//   }, [id.avatar]);
-
-
-//   // not working fine need to work on it
-//   // const handleImageUpload = async (event) => {
-//   //   console.log(event.target.files)
-//   //   const file = event.target.files[0];
-//   //   if (file) {
-//   //     const reader = new FileReader();
-//   //     reader.onload = (e) => setProfileImage(e.target.result);
-//   //     reader.readAsDataURL(file);
-//   //     console.log(file)
-//   //     const json = await updateAvatar(file);
-//   //     // console.log("res")
-//   //     // console.log(response)
-//   //     // console.log(response.data);
-//   //     if (response.data.avatar) {
-//   //     //   console.log("response data")
-//   //     //   console.log(response.data);
-//   //       setProfileImage(response.data.avatar);
-//   //     }
-//   //     // setProfileImage(id.avatar)
-//   //   }
-//   // };
-//   const handleImageUpload = async (event) => {
-//     console.log(event.target.files);
-//     const file = event.target.files[0];
-//     if (file) {
-//       const reader = new FileReader();
-//       reader.onload = (e) => setProfileImage(e.target.result);
-//       reader.readAsDataURL(file);
-//       console.log(file);
-
-//       const response = await updateAvatar(file);
-//       console.log("Response:", response);
-
-//       if (response?.data?.avatar) {
-//         console.log("Updated Avatar URL:", response.data.avatar);
-//         setProfileImage(response.data.avatar);
-//       }
-//     }
-//   };
-
-
-//   return (
-//     <>
-//       {/* <Navbar />
-//       <div className="dis">
-//         <div className="profile-container">
-//           <h1 className="profile-title">Profile</h1>
-//           <div className="profile-card">
-//             <div className="profile-image-container">
-//               {profileImage ? (
-//                 <img src={profileImage} alt="Profile" className="profile-image" />
-//                 // <img src={profileImage? profileImage:""} alt="Profile" className="profile-image" />
-//               ) : (
-//                 <div className="placeholder-image">No Image</div>
-//               )}
-//             </div>
-//             <label htmlFor="file-upload" className="file-upload-label">
-//               Upload Profile Picture
-//             </label>
-//             <input
-//               type="file"
-//               id="file-upload"
-//               className="file-upload"
-//               accept="image/*"
-//               onChange={handleImageUpload} />
-//           </div>
-//           <div className="profile-info">
-//             <p>Full Name: <span>{id?.fullname}</span></p>
-//             <p>Username: <span>{id?.username}</span></p>
-//             <p>Email: <span>{id?.email}</span></p>
-//           </div>
-//         </div>
-//       </div> */}
-//     </>
-//   );
-// }
-
-// export default Profile;
-
-
-
 import React, { useContext, useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import userContext from "../context/user/userContext";
-import { Camera, User, Mail } from "lucide-react"; // Assuming you are using react-icons
+import organisationContext from "../context/organisations/organisationContext";
+import ClassesContext from "../context/classes/classesContext"; // Import ClassesContext
+import { User, Mail, Building2, BookOpen, Check, Clock } from "lucide-react";
+
+// StatCard component remains the same
+const StatCard = ({ icon, value, label }) => (
+    <div className="bg-[#111827] p-4 rounded-lg text-center">
+      <div className="flex justify-center items-center mb-2">
+        {icon}
+      </div>
+      <p className="text-2xl font-bold text-white">{value}</p>
+      <p className="text-sm text-gray-400">{label}</p>
+    </div>
+);
 
 function Profile() {
-  const { id, updateAvatar, checkRefreshToken, userDetail } = useContext(userContext);
+  const { id, updateAvatar, checkRefreshToken, userDetail, fetchInvites } = useContext(userContext);
+  const { fetchOrganisations } = useContext(organisationContext);
+  const { fetchClasses } = useContext(ClassesContext); // Use ClassesContext
+  const navigate = useNavigate();
 
-  let navigate = useNavigate();
+  const [stats, setStats] = useState({
+    organizations: 0,
+    classes: 0,
+    invitesReceived: 0,
+    invitesAccepted: 0,
+    invitesPending: 0,
+  });
+  const [profileImage, setProfileImage] = useState(id?.avatar);
+  const [isUpdatingProfile, setIsUpdatingProfile] = useState(false);
+
+  const hasRun = useRef(false);
+  useEffect(() => {
+    const fetchData = async () => {
+      await checkAndRefreshToken();
+
+      // Fetch organizations and then fetch classes for each
+      const orgs = await fetchOrganisations();
+      if (orgs && orgs.length > 0) {
+        let classCount = 0;
+        const classPromises = orgs.map(org => fetchClasses(org._id));
+        const classesPerOrg = await Promise.all(classPromises);
+
+        classesPerOrg.forEach(classGroup => {
+          if(classGroup && classGroup.classes) {
+            classCount += classGroup.classes.length;
+          }
+        });
+
+        setStats(prev => ({ ...prev, organizations: orgs.length, classes: classCount }));
+      }
+
+      // Fetch invites and calculate stats
+      const invites = await fetchInvites();
+      if (invites) {
+        setStats(prev => ({
+          ...prev,
+          invitesReceived: invites.length,
+          invitesAccepted: invites.filter(i => i.status === 'Accepted').length,
+          invitesPending: invites.filter(i => i.status === 'Pending').length,
+        }));
+      }
+    };
+
+    if (!hasRun.current) {
+      hasRun.current = true;
+      fetchData();
+    }
+  }, []);
+
   const checkAndRefreshToken = async () => {
     const accessToken = localStorage.getItem("accessToken");
     if (accessToken && accessToken !== undefined) {
@@ -137,22 +80,11 @@ function Profile() {
     checkRefreshToken();
   };
 
-  const hasRun = useRef(false);
   useEffect(() => {
-    if (!hasRun.current) {
-      hasRun.current = true;
-      checkAndRefreshToken();
+    if (id?.avatar) {
+      setProfileImage(id.avatar);
     }
-    // eslint-disable-next-line
-  }, []);
-
-
-  const [profileImage, setProfileImage] = useState(id?.avatar);
-  const [isUpdatingProfile, setIsUpdatingProfile] = useState(false);
-
-  useEffect(() => {
-    setProfileImage(id.avatar);
-  }, [id.avatar]);
+  }, [id?.avatar]);
 
   const handleImageUpload = async (event) => {
     const file = event.target.files[0];
@@ -160,103 +92,79 @@ function Profile() {
       const reader = new FileReader();
       reader.onload = (e) => setProfileImage(e.target.result);
       reader.readAsDataURL(file);
-
       setIsUpdatingProfile(true);
-      const response = await updateAvatar(file);
+      await updateAvatar(file);
       setIsUpdatingProfile(false);
-
-      if (response?.data?.avatar) {
-        setProfileImage(response.data.avatar);
-      }
     }
   };
 
   return (
-    <div className="h-screen pt-20">
-      <div className="max-w-2xl mx-auto p-4 py-8">
-        <div className="bg-base-300 rounded-xl p-6 space-y-8">
-          <div className="text-center">
-            <h1 className="text-2xl font-semibold">Profile</h1>
-            <p className="mt-2">Your profile information</p>
-          </div>
+      <div className="bg-[#111827] text-gray-200 font-sans w-full p-10">
+        <h1 className="text-3xl font-bold text-white">Profile</h1>
+        <p className="text-gray-400 mt-2 mb-8">Your profile information</p>
 
-          {/* Avatar upload section */}
-          <div className="flex flex-col items-center gap-4">
-            <div className="relative">
-              <img
+        <div className="bg-[#1F2937] p-6 rounded-xl flex items-center space-x-6 mb-8">
+          <div className="relative flex-shrink-0">
+            <img
+                className="w-24 h-24 rounded-full object-cover"
                 src={profileImage || "/avatar.png"}
                 alt="Profile"
-                className="size-32 rounded-full object-cover border-4"
-              />
-              <label
-                htmlFor="avatar-upload"
-                className={`
-                  absolute bottom-0 right-0 
-                  bg-base-content hover:scale-105
-                  p-2 rounded-full cursor-pointer 
-                  transition-all duration-200
-                  ${isUpdatingProfile ? "animate-pulse pointer-events-none" : ""}
-                `}
-              >
-                <Camera className="w-5 h-5 text-base-200" />
-                <input
+            />
+            <label htmlFor="avatar-upload" className="absolute bottom-0 right-0 bg-gray-600 hover:bg-gray-500 text-xs p-1 rounded-full cursor-pointer">
+              Change
+              <input
                   type="file"
                   id="avatar-upload"
                   className="hidden"
                   accept="image/*"
                   onChange={handleImageUpload}
                   disabled={isUpdatingProfile}
-                />
-              </label>
-            </div>
-            <p className="text-sm text-zinc-400">
-              {isUpdatingProfile ? "Uploading..." : "Click the camera icon to update your photo"}
-            </p>
+              />
+            </label>
           </div>
-
-          {/* Profile information */}
-          <div className="space-y-6">
-            <div className="space-y-1.5">
-              <div className="text-sm text-zinc-400 flex items-center gap-2">
-                <User className="w-4 h-4" />
-                Full Name
-              </div>
-              <p className="px-4 py-2.5 bg-base-200 rounded-lg border">{id?.fullname || "N/A"}</p>
+          <div className="flex-1 grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4">
+            <div>
+              <h2 className="text-2xl font-bold text-white">{id?.fullname || "N/A"}</h2>
+              <p className="text-gray-400">@{id?.username || "N/A"}</p>
             </div>
-
-            <div className="space-y-1.5">
-              <div className="text-sm text-zinc-400 flex items-center gap-2">
-                <Mail className="w-4 h-4" />
-                Username
-              </div>
-              <p className="px-4 py-2.5 bg-base-200 rounded-lg border">{id?.username || "N/A"}</p>
+            <div className="flex items-start md:items-center pt-2">
+            <span className="ml-auto bg-green-500 text-green-900 text-xs font-semibold px-2.5 py-0.5 rounded-full">
+              Active
+            </span>
             </div>
-            <div className="space-y-1.5">
-              <div className="text-sm text-zinc-400 flex items-center gap-2">
-                <Mail className="w-4 h-4" />
-                Email Address
-              </div>
-              <p className="px-4 py-2.5 bg-base-200 rounded-lg border">{id?.email || "N/A"}</p>
-            </div>
-          </div>
-
-          {/* Account information */}
-          <div className="mt-6 bg-base-300 rounded-xl p-6">
-            <h2 className="text-lg font-medium mb-4">Account Information</h2>
-            <div className="space-y-3 text-sm">
-              <div className="flex items-center justify-between py-2 border-b border-zinc-700">
-                <span>Member Since</span>
-                <span>{id?.createdAt?.split("T")[0] || "N/A"}</span>
-              </div>
-              <div className="flex items-center justify-between py-2">
-                <span>Account Status</span>
-                <span className="text-green-500">Active</span>
+            <div className="col-span-full">
+              <label className="block text-sm font-medium text-gray-400 mb-1">Email Address</label>
+              <div className="flex items-center justify-between">
+                <p className="text-white">{id?.email || "N/A"}</p>
+                {/*This feature is under review and can be added later.*/}
+                {/*<a href="#" className="text-sm text-indigo-400 hover:underline">*/}
+                {/*  change Email*/}
+                {/*</a>*/}
               </div>
             </div>
           </div>
         </div>
+
+        <div className="bg-[#1F2937] p-8 rounded-xl">
+          <h3 className="text-xl font-semibold text-white mb-6">Activity & Statistics</h3>
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 mb-8">
+            <StatCard icon={<Building2 className="text-purple-400" />} value={stats.organizations} label="Organisations" />
+            <StatCard icon={<BookOpen className="text-blue-400" />} value={stats.classes} label="Classes" />
+            <StatCard icon={<Mail className="text-yellow-400" />} value={stats.invitesReceived} label="Invites Received" />
+            <StatCard icon={<Check className="text-green-400" />} value={stats.invitesAccepted} label="Accepted" />
+            <StatCard icon={<Clock className="text-orange-400" />} value={stats.invitesPending} label="Pending" />
+          </div>
+          {/*This feature is under review and can be added later.*/}
+          {/*<div className="flex justify-end space-x-4">*/}
+          {/*  <button className="px-6 py-2 bg-gray-600 hover:bg-gray-500 rounded-lg font-semibold">*/}
+          {/*    Edit Profile*/}
+          {/*  </button>*/}
+          {/*  <button className="px-6 py-2 bg-indigo-600 hover:bg-indigo-500 rounded-lg font-semibold">*/}
+          {/*    Save Changes*/}
+          {/*  </button>*/}
+          {/*</div>*/}
+        </div>
       </div>
-    </div>
   );
 }
 

@@ -154,6 +154,27 @@ const UserState = (props) => {
         }
     };
 
+    const fetchInvites = async () => {
+        try{
+            const response=await fetch('{host}api/v1/users/invites',{
+                mathod:'GET',
+                headers:{
+                    'Content-Type':'applicatoin/json',
+                    'Authorization':`Bearer${localStorage.getItem('accessToken')}`
+                }
+            });
+
+            if(response.ok){
+                const json=await  response.json();
+                return json.data;
+            }
+            return[];
+        } catch (error) {
+            console.log("Error fetching invites", error);
+            return [];
+        }
+    }
+
     const checkRefreshToken =  async ()=>{
         try {
             const response = await fetch(`${host}api/v1/users/refreshToken`, {
@@ -234,7 +255,7 @@ const UserState = (props) => {
     
     // userDetail();
     return (
-        <userContext.Provider value={{ loginUser, registerUser, userDetail, updateAvatar, checkRefreshToken, logout, id }}>
+        <userContext.Provider value={{ loginUser, registerUser, userDetail, updateAvatar, checkRefreshToken, logout, id,fetchInvites }}>
             {props.children}
         </userContext.Provider>
     )

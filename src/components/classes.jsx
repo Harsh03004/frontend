@@ -1,14 +1,13 @@
-
 import React, { useState, useEffect, useContext } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import ClassesContext from "../context/classes/classesContext";
-import { Plus, X } from "lucide-react";
+import { Plus, X, ArrowLeft, BookOpen, Trash2 } from "lucide-react";
 
 const Classes = () => {
-  const { organisationId } = useParams(); // FIXED here
+  const { organisationId } = useParams();
   const { classes, loading, error, fetchClasses, createClass, deleteClass } = useContext(ClassesContext);
   const navigate = useNavigate();
-  
+
   const [newClassName, setNewClassName] = useState("");
   const [newClassDescription, setNewClassDescription] = useState("");
   const [showForm, setShowForm] = useState(false);
@@ -18,124 +17,107 @@ const Classes = () => {
       fetchClasses(organisationId);
     }
   }, [organisationId]);
-  
 
   const handleCreateClass = async (e) => {
     e.preventDefault();
-    await createClass(organisationId, {
-      name: newClassName,
-      description: newClassDescription,
-    });
+    await createClass(organisationId, { name: newClassName, description: newClassDescription });
     setNewClassName("");
     setNewClassDescription("");
-    setShowForm(false); // Auto-close the form after creation (optional UX)
+    setShowForm(false);
   };
 
-  const handleGoBack = () => {
-    navigate(-1);
-  };
-
-  const handleNavigateToClasses = (organisationId,classId) => { 
-    navigate(`/organisation/${organisationId}/classes/${classId}`); // Navigate to the classes page
-  };
-
-  const handleDeleteClass = async (classId) => {
-  console.log(classId)
-  console.log(organisationId)
-    try {
-      await deleteClass(organisationId, classId); // Call the API to delete the class
-      classes((prev) => prev.filter((cls) => cls._id !== classId)); // Remove the deleted class from the state
-    } catch (err) {
-      setError ("Failed to delete class");
-    }finally
-    {
-      loading(false);
-    }
+  const handleDeleteClass = async (e, classId) => {
+    e.stopPropagation();
+    await deleteClass(organisationId, classId);
   };
 
   return (
-    <div className="max-w-4xl mx-auto p-6">
-      
-      {/* Go Back Button */}
-      <button onClick={handleGoBack} className="mb-6 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">
-        Go back
-      </button>
-
-      {error && <div className="alert alert-error shadow-lg mb-4">{error}</div>}
-
-      {/* Page Title */}
-      <h1 className="text-2xl font-bold mb-6">Classes</h1>
-
-      {/* New / Cancel Button */}
-      <button
-        onClick={() => setShowForm((prev) => !prev)}
-        className="btn btn-primary flex items-center gap-2 mb-6"
-      >
-        {showForm ? <X className="w-5 h-5" /> : <Plus className="w-5 h-5" />} {showForm ? "Cancel" : "New"}
-      </button>
-
-      {/* Create Class Form */}
-      {showForm && (
-        <form
-          onSubmit={handleCreateClass}
-          className="bg-base-200 p-4 rounded-lg shadow-md mb-6 space-y-4"
-        >
-          <input
-            type="text"
-            placeholder="Class Name"
-            value={newClassName}
-            onChange={(e) => setNewClassName(e.target.value)}
-            required
-            className="input input-bordered w-full"
-          />
-          <textarea
-            placeholder="Class Description"
-            value={newClassDescription}
-            onChange={(e) => setNewClassDescription(e.target.value)}
-            required
-            className="textarea textarea-bordered w-full"
-          />
+      <div className="bg-[#111827] text-gray-200 font-sans w-full p-10 min-h-screen">
+        <div className="flex items-center gap-4 mb-8">
           <button
-            type="submit"
-            disabled={loading || !newClassName.trim()}
-            className={`btn btn-success w-full ${loading ? "loading" : ""}`}
+              onClick={() => navigate(-1)}
+              className="btn btn-circle bg-gray-700 hover:bg-gray-600 border-none"
           >
-            {loading ? "Creating..." : "Create"}
+            <ArrowLeft />
           </button>
-        </form>
-      )}
+          <h1 className="text-3xl font-bold text-white">Classes</h1>
+        </div>
 
-      {/* Class List */}
-      {loading ? (
-        <div className="text-center text-gray-500">Loading classes...</div>
-      ) : classes.length > 0 ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-  {classes.map((cls, index) => (
-    <div
-      key={cls._id || index}
-      className="card bg-base-100 shadow-md hover:shadow-lg transition-shadow"
-      onClick= {() => handleNavigateToClasses(organisationId, cls._id)} // Navigate to classes when clicked
-    >
-      <div className="card-body">
-        <h2 className="card-title">{cls.name || "Untitled"}</h2>
-        <p>{cls.description || "No Description Available"}</p>
-
-        <div className="flex justify-end gap-2 mt-4">
+        <div className="flex justify-end mb-8">
           <button
-            className="btn btn-error btn-sm"
-            onClick={() => handleDeleteClass(cls._id)}
+              onClick={() => setShowForm(!showForm)}
+              className="btn btn-primary flex items-center gap-2 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold py-2 px-4 rounded-lg"
           >
-            Delete
+            {showForm ? <X size={20} /> : <Plus size={20} />}
+            <span>{showForm ? "Cancel" : "New Class"}</span>
           </button>
         </div>
+
+        {showForm && (
+            <div className="bg-[#1F2937] p-6 rounded-xl mb-8">
+              <form onSubmit={handleCreateClass} className="space-y-4">
+                <h2 className="text-xl font-semibold text-white">Create New Class</h2>
+                <input
+                    type="text"
+                    placeholder="Class Name"
+                    value={newClassName}
+                    onChange={(e) => setNewClassName(e.target.value)}
+                    required
+                    className="input input-bordered w-full bg-[#2b3a4e] border-gray-600 rounded-lg p-3 text-white"
+                />
+                <textarea
+                    placeholder="Class Description"
+                    value={newClassDescription}
+                    onChange={(e) => setNewClassDescription(e.target.value)}
+                    required
+                    className="textarea textarea-bordered w-full bg-[#2b3a4e] border-gray-600 rounded-lg p-3 text-white"
+                />
+                <button
+                    type="submit"
+                    disabled={loading}
+                    className="btn btn-success bg-green-600 hover:bg-green-500 text-white font-semibold py-2 px-4 rounded-lg"
+                >
+                  {loading ? "Creating..." : "Create"}
+                </button>
+              </form>
+            </div>
+        )}
+
+        {loading ? (
+            <p className="text-center text-gray-400">Loading classes...</p>
+        ) : classes.length > 0 ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {classes.map((cls) => (
+                  <div
+                      key={cls._id}
+                      className="bg-[#1F2937] rounded-xl p-6 flex flex-col justify-between hover:ring-2 hover:ring-indigo-500 transition-all cursor-pointer"
+                      onClick={() => navigate(`/organisation/${organisationId}/classes/${cls._id}`)}
+                  >
+                    <div>
+                      <div className="flex items-center gap-3 mb-3">
+                        <BookOpen className="text-indigo-400" size={24} />
+                        <h2 className="text-xl font-bold text-white truncate">{cls.name}</h2>
+                      </div>
+                      <p className="text-gray-400 text-sm h-16">{cls.description}</p>
+                    </div>
+                    <div className="flex justify-end mt-4">
+                      <button
+                          onClick={(e) => handleDeleteClass(e, cls._id)}
+                          className="text-red-400 hover:text-red-300 transition-colors"
+                      >
+                        <Trash2 size={20} />
+                      </button>
+                    </div>
+                  </div>
+              ))}
+            </div>
+        ) : (
+            <div className="text-center py-16 bg-[#1F2937] rounded-xl">
+              <h2 className="text-xl font-semibold text-white">No classes found</h2>
+              <p className="text-gray-400 mt-2">Get started by creating a new class.</p>
+            </div>
+        )}
       </div>
-    </div>
-  ))}
-</div>
-      ) : (
-        <div className="text-center text-gray-500">No classes found</div>
-      )}
-    </div>
   );
 };
 

@@ -1,199 +1,138 @@
 import React, { useState, useContext, useEffect, useRef } from "react";
-import { useNavigate } from "react-router-dom"; // Import useNavigate
-import { Plus, X } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { Plus, X, Building2, Trash2 } from "lucide-react";
 import organisationContext from "../context/organisations/organisationContext";
-import ClassesContext from "../context/classes/classesContext";
 import userContext from "../context/user/userContext";
-
-
 
 const Organisation = () => {
   const { fetchOrganisations, createOrganisation, deleteOrganisation } = useContext(organisationContext);
-  const { fetchClasses } = useContext(ClassesContext);
+  const { checkRefreshToken, userDetail } = useContext(userContext);
+
   const [organisations, setOrganisations] = useState([]);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [newOrgName, setNewOrgName] = useState("");
   const [newOrgDescription, setNewOrgDescription] = useState("");
-  const [creating, setCreating] = useState(false);
   const [showForm, setShowForm] = useState(false);
-  const [shouldFetch, setShouldFetch] = useState(true);
 
-  const navigate = useNavigate(); // Initialize useNavigate
+  const navigate = useNavigate();
+  const hasFetched = useRef(false);
 
+  useEffect(() => {
+    const loadData = async () => {
+      if (hasFetched.current) return;
+      hasFetched.current = true;
 
-  const { id, updateAvatar, checkRefreshToken, userDetail } = useContext(userContext);
-
-  const checkAndRefreshToken = async () => {
-    const accessToken = localStorage.getItem("accessToken");
-    if (accessToken && accessToken !== undefined) {
       await userDetail();
-      return;
-    }
-    checkRefreshToken();
-  };
 
-  const hasRun = useRef(false);
-  useEffect(() => {
-    if (!hasRun.current) {
-      hasRun.current = true;
-      checkAndRefreshToken();
-    }
-    // eslint-disable-next-line
+      try {
+        const data = await fetchOrganisations();
+        setOrganisations(data || []);
+      } catch (err) {
+        setError("Failed to fetch organisations");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    checkRefreshToken().then(loadData);
   }, []);
-
-  const hasFetched = useRef(false); // 👈 this is the important line
-
-  const loadOrganisations = async () => {
-    if (hasFetched.current) return; // ✅ Prevent double fetch
-    hasFetched.current = true; // ✅ Mark as fetched
-    try {
-      setLoading(true);
-      const data = await fetchOrganisations();
-      setOrganisations(data || []);
-    } catch (err) {
-      setError("Failed to fetch organisations");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  
-  useEffect(() => {
-    loadOrganisations();
-    // eslint-disable-next-line
-  }, [ shouldFetch, fetchOrganisations ]); // Fetch organisations when the component is rendered or when `shouldFetch` changes
 
   const handleCreateOrganisation = async (e) => {
     e.preventDefault();
-    setCreating(true);
-
-    try {
-      await createOrganisation({
-        name: newOrgName,
-        description: newOrgDescription,
-      });
-      setNewOrgName("");
-      setNewOrgDescription("");
-      setShowForm(false);
-      hasFetched.current = false;
-      await loadOrganisations();
-      setShouldFetch(true);
-    } catch (err) {
-      setError("Failed to create organisation");
-    } finally {
-      setCreating(false);
-    }
+    await createOrganisation({
+      name: newOrgName,
+      description: newOrgDescription,
+    });
+    setNewOrgName("");
+    setNewOrgDescription("");
+    setShowForm(false);
+    hasFetched.current = false; // Refetch after creating
   };
 
-  const handleNavigateToClasses = (organisationId) => {
-    fetchClasses(organisationId); // Fetch classes for the selected organisation
-    navigate(`/organisation/${organisationId}/classes`); // Navigate to the classes page
+  const handleDeleteOrganisation = async (e, organisationId) => {
+    e.stopPropagation(); // Prevent navigation when clicking the delete button
+    await deleteOrganisation(organisationId);
+    setOrganisations(prev => prev.filter(org => org._id !== organisationId));
   };
 
-  const handleDeleteOrganisation = async (organisationId) =>{
-    console.log("Deleting organisation with ID:", organisationId);  
-    try{
-      setLoading(true);
-      await deleteOrganisation(organisationId);
-      setOrganisations((prev) => prev.filter((org) => org._id !== organisationId));
-      setShouldFetch(true);
-    }
-    catch (err) {
-      setError("Failed to delete organisation");
-    } finally {
-      setLoading(false);
-    }
-  }
   return (
-    <div className="max-w-4xl mx-auto p-6">
-      {error && <div className="alert alert-error shadow-lg mb-4">{error}</div>}
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold">Organisations</h1>
-        <button
-          onClick={() => setShowForm((prev) => !prev)}
-          className="btn btn-primary flex items-center gap-2"
-        >
-          {showForm ? <X className="w-5 h-5" /> : <Plus className="w-5 h-5" />} {showForm ? "Cancel" : "New"}
-        </button>
-      </div>
-
-      {showForm && (
-        <form
-          onSubmit={handleCreateOrganisation}
-          className="bg-base-200 p-4 rounded-lg shadow-md mb-6 space-y-4"
-        >
-          <input
-            type="text"
-            placeholder="Organisation Name"
-            value={newOrgName}
-            onChange={(e) => setNewOrgName(e.target.value)}
-            required
-            className="input input-bordered w-full"
-          />
-          <textarea
-            placeholder="Organisation Description"
-            value={newOrgDescription}
-            onChange={(e) => setNewOrgDescription(e.target.value)}
-            required
-            className="textarea textarea-bordered w-full"
-          />
+      <div className="bg-[#111827] text-gray-200 font-sans w-full p-10 min-h-screen">
+        <div className="flex justify-between items-center mb-8">
+          <h1 className="text-3xl font-bold text-white">Organisations</h1>
           <button
-            type="submit"
-            disabled={creating}
-            className={`btn btn-success ${creating ? "loading" : ""}`}
+              onClick={() => setShowForm(!showForm)}
+              className="btn btn-primary flex items-center gap-2 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold py-2 px-4 rounded-lg"
           >
-            {creating ? "Creating..." : "Create"}
-          </button>
-        </form>
-      )}
-
-      {loading ? (
-        <div className="text-center text-gray-500">Loading organisations...</div>
-      ) : organisations.length > 0 ? (
-        // <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        //   {organisations.map((org, index) => (
-        //     <div
-        //       key={org._id || index}
-        //       className="card bg-base-100 shadow-md hover:shadow-lg transition-shadow cursor-pointer"
-        //       onClick={() => handleNavigateToClasses(org._id)} // Navigate to classes when clicked
-        //     >
-        //       <div className="card-body">
-        //         <h2 className="card-title">{org.name || "Untitled"}</h2>
-        //         <p>{org.description || "No Description Available"}</p>
-        //       </div>
-        //     </div>
-        //   ))}
-        // </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-  {organisations.map((org, index) => (
-    <div
-      key={org._id || index}
-      className="card bg-base-100 shadow-md hover:shadow-lg transition-shadow cursor-pointer"
-      onClick={() => handleNavigateToClasses(org._id)} // Navigate to classes when the card is clicked
-    >
-      <div className="card-body">
-        <h2 className="card-title">{org.name || "Untitled"}</h2>
-        <p>{org.description || "No Description Available"}</p>
-        <div className="flex justify-end gap-2 mt-4">
-          <button
-            className="btn btn-error btn-sm"
-            onClick={(e) => {
-              e.stopPropagation(); // Prevent the click event from propagating to the card
-              handleDeleteOrganisation(org._id); // Call the delete function
-            }}
-          >
-            Delete
+            {showForm ? <X size={20} /> : <Plus size={20} />}
+            <span>{showForm ? "Cancel" : "New Organisation"}</span>
           </button>
         </div>
+
+        {showForm && (
+            <div className="bg-[#1F2937] p-6 rounded-xl mb-8">
+              <form onSubmit={handleCreateOrganisation} className="space-y-4">
+                <h2 className="text-xl font-semibold text-white">Create New Organisation</h2>
+                <input
+                    type="text"
+                    placeholder="Organisation Name"
+                    value={newOrgName}
+                    onChange={(e) => setNewOrgName(e.target.value)}
+                    required
+                    className="input input-bordered w-full bg-[#2b3a4e] border-gray-600 rounded-lg p-3 text-white"
+                />
+                <textarea
+                    placeholder="Organisation Description"
+                    value={newOrgDescription}
+                    onChange={(e) => setNewOrgDescription(e.target.value)}
+                    required
+                    className="textarea textarea-bordered w-full bg-[#2b3a4e] border-gray-600 rounded-lg p-3 text-white"
+                />
+                <button
+                    type="submit"
+                    className="btn btn-success bg-green-600 hover:bg-green-500 text-white font-semibold py-2 px-4 rounded-lg"
+                >
+                  Create
+                </button>
+              </form>
+            </div>
+        )}
+
+        {loading ? (
+            <p className="text-center text-gray-400">Loading organisations...</p>
+        ) : organisations.length > 0 ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {organisations.map((org) => (
+                  <div
+                      key={org._id}
+                      className="bg-[#1F2937] rounded-xl p-6 flex flex-col justify-between hover:ring-2 hover:ring-indigo-500 transition-all cursor-pointer"
+                      onClick={() => navigate(`/organisation/${org._id}/classes`)}
+                  >
+                    <div>
+                      <div className="flex items-center gap-3 mb-3">
+                        <Building2 className="text-indigo-400" size={24} />
+                        <h2 className="text-xl font-bold text-white truncate">{org.name}</h2>
+                      </div>
+                      <p className="text-gray-400 text-sm h-16">{org.description}</p>
+                    </div>
+                    <div className="flex justify-end mt-4">
+                      <button
+                          onClick={(e) => handleDeleteOrganisation(e, org._id)}
+                          className="text-red-400 hover:text-red-300 transition-colors"
+                      >
+                        <Trash2 size={20} />
+                      </button>
+                    </div>
+                  </div>
+              ))}
+            </div>
+        ) : (
+            <div className="text-center py-16 bg-[#1F2937] rounded-xl">
+              <h2 className="text-xl font-semibold text-white">No organisations found</h2>
+              <p className="text-gray-400 mt-2">Get started by creating a new organisation.</p>
+            </div>
+        )}
       </div>
-    </div>
-  ))}
-</div>
-      ) : (
-        <div className="text-center text-gray-500">No organisations found</div>
-      )}
-    </div>
   );
 };
 
