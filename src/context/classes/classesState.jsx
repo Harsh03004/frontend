@@ -26,6 +26,7 @@ const ClassesState = ({ children }) => {
       if (!response.ok) throw new Error(result.message || "Error fetching classes");
   
       setClasses(result.data.classes || []); // since data is wrapped inside .data.classes
+      return result.data;
     } catch (err) {
       console.error(err);
       setError(err.message || "Failed to fetch classes");
