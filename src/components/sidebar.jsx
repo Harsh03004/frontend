@@ -1,13 +1,7 @@
 import React, { useState } from "react";
-import { useNavigate, useLocation } from "react-router-dom"; // 1. Import useLocation
-import {
-    Video,
-    User,
-    Building2,
-    ChevronLeft,
-    ChevronRight,
-    Mail,
-} from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { MessageCircle, Video, User, Building2, ChevronLeft, ChevronRight, Mail } from "lucide-react";
+
 
 const menuItems = [
     { name: "Instant Meet", icon: <Video size={18} /> },
@@ -68,6 +62,4 @@ const Sidebar = ({ setActivePage }) => {
             </nav>
         </div>
     );
-};
-
 export default Sidebar;

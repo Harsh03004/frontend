@@ -1,9 +1,6 @@
 import { useState } from 'react';
-// import { json } from 'react-router-dom';
 import userContext from './userContext';
-// import {connect, io} from 'socket.io-client';
 import { data, useNavigate } from 'react-router-dom';
-
 import toast from 'react-hot-toast';
 import response from "assert";
 
@@ -14,27 +11,6 @@ const UserState = (props) => {
     const [id, setId] = useState("");
     const [socket, setSocket] = useState(null); 
     const host = "http://localhost:3000/"
-
-//     const connectSocket = (userId) => {
-//       if (socket?.connected) return; // Avoid reconnecting if already connected
-
-//       const newSocket = io(host, {
-//           query: { userId }, // Pass the user ID to the server
-//       });
-
-//       newSocket.connect();
-//       setSocket(newSocket);
-
-//       newSocket.on("getOnlineUsers", (onlineUsers) => {
-//           console.log("Online Users:", onlineUsers);
-//       });
-//   };
-//   const disconnectSocket = () => {
-//     if (socket?.connected) {
-//         socket.disconnect();
-//         setSocket(null);
-//     }
-// };
 
     const loginUser = async (credentials) => {
         const response = await fetch(`${host}api/v1/users/login`, {
@@ -48,9 +24,6 @@ const UserState = (props) => {
         try {
             const json = await response.json();
 
-            // console.log('Response:', response);
-            // console.log("------------------")
-            // console.log('Response JSON:', json);
 
             if (response.status === 200) {
                 // console.log('Access Token:', json.data.accessToken);
