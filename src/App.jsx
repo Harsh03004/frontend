@@ -5,6 +5,7 @@ import Chat from "./components/chat";
 import HomePage from "./pages/homePage";
 import Alert from "./components/Alert";
 import UserState from "./context/user/UserState";
+import RoomChatState from "./context/roomChat/roomChatState";
 import ForgotPassword from "./components/ForgotPassword"
 import Landing from "./components/landing";
 import { Navigation } from "lucide-react";
@@ -43,40 +44,42 @@ function App() {
     <>
       <Router>
         <UserState showAlert={showAlert}>
-          <OrganisationState>
-          <ClassesState>  
-          <Alert alert={alert} />
-          <div className="flex-1">
-            <Navbar />
-            <div className ="pt-16 px-4">
-            <Routes>
-              <Route exact path="/" element={<Landing showAlert={showAlert} />} />
-              {/* <Route exact path="/home" element={<HomePage />} /> */}
-              {/* <Route exact path="/profile" element={<Profile showAlert={showAlert} />} /> */}
-              <Route path="/login" element={!userId ? <LoginPage showAlert = {showAlert} /> : <Navigate to="/" />} />
-              <Route exact path="/register" element ={<RegisterPage />} />
-              <Route exact path="/forgotPassword" element={<ForgotPassword showAlert={showAlert} />} />
-              <Route exact path="/room" element={<Room />} />
-              <Route exact path="/lobby" element={<LobbyPage />} /> 
+          <RoomChatState>
+            <OrganisationState>
+            <ClassesState>  
+            <Alert alert={alert} />
+            <div className="flex-1">
+              <Navbar />
+              <div className ="pt-16 px-4">
+              <Routes>
+                <Route exact path="/" element={<Landing showAlert={showAlert} />} />
+                {/* <Route exact path="/home" element={<HomePage />} /> */}
+                {/* <Route exact path="/profile" element={<Profile showAlert={showAlert} />} /> */}
+                <Route path="/login" element={!userId ? <LoginPage showAlert = {showAlert} /> : <Navigate to="/" />} />
+                <Route exact path="/register" element ={<RegisterPage />} />
+                <Route exact path="/forgotPassword" element={<ForgotPassword showAlert={showAlert} />} />
+                <Route exact path="/room" element={<Room />} />
+                <Route exact path="/lobby" element={<LobbyPage />} /> 
 
-              {/* <Route exact path="/chat" element={<Chat />} /> */}
-              {/* <Route path="/organisation/:organisationId/classes" element={<Classes />} /> */}
+                {/* <Route exact path="/chat" element={<Chat />} /> */}
+                {/* <Route path="/organisation/:organisationId/classes" element={<Classes />} /> */}
 
 
-              <Route path="/home" element={<HomePage />} >
-                <Route exact path="organisation" element={<Organisation showAlert={showAlert} />} />
-                <Route exact path="chat" element={<Chat />} />
-                <Route exact path="invites" element={<Invite />} />
-                <Route exact path="profile" element={<Profile showAlert={showAlert} />} />
-              </Route>
-                <Route exact path="/organisation/:organisationId/classes" element={<Classes />} />
-                <Route exact path="/organisation/:organisationId/classes/:classId" element={<ClassPage />} />
-            </Routes>
+                <Route path="/home" element={<HomePage />} >
+                  <Route exact path="organisation" element={<Organisation showAlert={showAlert} />} />
+                  <Route exact path="chat" element={<Chat />} />
+                  <Route exact path="invites" element={<Invite />} />
+                  <Route exact path="profile" element={<Profile showAlert={showAlert} />} />
+                </Route>
+                  <Route exact path="/organisation/:organisationId/classes" element={<Classes />} />
+                  <Route exact path="/organisation/:organisationId/classes/:classId" element={<ClassPage />} />
+              </Routes>
+              </div>
+              <Toaster />
             </div>
-            <Toaster />
-          </div>
-          </ClassesState>
-          </OrganisationState>
+            </ClassesState>
+            </OrganisationState>
+          </RoomChatState>
         </UserState>
       </Router>
     </>

@@ -2,6 +2,8 @@ import React, { useContext, useEffect, useRef, useState } from 'react';
 import AgoraRTC from 'agora-rtc-sdk-ng';
 import { useNavigate } from 'react-router-dom'
 import userContext from "../context/user/userContext";
+import roomChatContext from "../context/roomChat/roomChatContext";
+import RoomChat from "../components/RoomChat";
 import './styles/main.css';
 import './styles/room.css';
 import { MdAddComment } from 'react-icons/md';
@@ -13,6 +15,7 @@ const Room = () => {
 
 
   const { checkRefreshToken, userDetail } = useContext(userContext);
+  const { joinRoom, leaveRoom } = useContext(roomChatContext);
 
   let navigate = useNavigate();
   const checkAndRefreshToken = async () => {
@@ -75,6 +78,7 @@ const Room = () => {
   const [sharingScreen, setSharingScreen] = useState(false);
   const [activeMemberContainer, setActiveMemberContainer] = useState(false);
   const [activeChatContainer, setActiveChatContainer] = useState(false);
+  const [showRoomChat, setShowRoomChat] = useState(false);
   const [userIdInDisplayFrame, setUserIdInDisplayFrame] = useState(null);
   const [roomMembers, setRoomMembers] = useState([]);
 
@@ -133,6 +137,9 @@ const Room = () => {
         client.on('user-published', handleUserPublished);
         client.on('user-left', handleUserLeft);
         await joinStream();
+        
+        // Join chat room for instant messaging
+        joinRoom(roomId, 'instant');
       } catch (error) {
         console.error('Error joining room:', error);
       }
@@ -143,6 +150,8 @@ const Room = () => {
     return () => {
       localTracksRef.current.forEach(track => track && track.close());
       client.leave();
+      // Leave chat room when leaving video room
+      leaveRoom();
     };
 
 
@@ -380,7 +389,11 @@ const Room = () => {
   };
 
   const handleChatButtonClick = () => {
-    setActiveChatContainer(prev => !prev);
+    setShowRoomChat(true);
+  };
+
+  const handleCloseRoomChat = () => {
+    setShowRoomChat(false);
   };
 
   const expandVideoFrame = (event) => {
@@ -432,6 +445,13 @@ const Room = () => {
 
   return (
     <>
+      {showRoomChat && (
+        <RoomChat
+          roomId={roomId}
+          messageType="instant"
+          onClose={handleCloseRoomChat}
+        />
+      )}
       <header id="nav">
         <div className="nav--list">
           <button id="members__button" onClick={handleMemberButtonClick}>
