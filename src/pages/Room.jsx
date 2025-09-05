@@ -2,6 +2,9 @@ import React, { useContext, useEffect, useRef, useState } from 'react';
 import AgoraRTC from 'agora-rtc-sdk-ng';
 import { useNavigate } from 'react-router-dom'
 import userContext from "../context/user/userContext";
+
+import roomChatContext from "../context/roomChat/roomChatContext";
+import RoomChat from "../components/RoomChat";
 import './styles/main.css';
 import './styles/room.css';
 import { MdAddComment } from 'react-icons/md';
@@ -13,11 +16,14 @@ const Room = () => {
 
 
   const { checkRefreshToken, userDetail } = useContext(userContext);
+  const { joinRoom, leaveRoom } = useContext(roomChatContext);
 
   let navigate = useNavigate();
   const checkAndRefreshToken = async () => {
 
     const accessToken = localStorage.getItem("accessToken");
+    const urlParam=new URLSearchParams(window.location.search);
+    const targetRoom = urlParam.get('room') || 'main';
     if (!id) {
       navigate('/lobby'); // Use navigate instead of window.location
       return;
@@ -44,6 +50,10 @@ const Room = () => {
       try {
         const info = await userDetail();
         setUserDetails(info);
+        const saved = localStorage.getItem('display_name');
+        if(!saved && info?.fullname) {
+          localStorage.setItem('display_name', info.fullname);
+        }
       } catch (error) {
         console.error('Error getting user info:', error);
       }
@@ -57,6 +67,7 @@ const Room = () => {
     sessionStorage.setItem("roomId", storedRoomId);
     return storedRoomId;
   });
+
 
   const [profileImage, setProfileImage] = useState(id?.avatar);
   // const [displayName, setdisplayName] = useState(id?.fullname);
@@ -75,8 +86,10 @@ const Room = () => {
   const [sharingScreen, setSharingScreen] = useState(false);
   const [activeMemberContainer, setActiveMemberContainer] = useState(false);
   const [activeChatContainer, setActiveChatContainer] = useState(false);
+  const [showRoomChat, setShowRoomChat] = useState(false);
   const [userIdInDisplayFrame, setUserIdInDisplayFrame] = useState(null);
   const [roomMembers, setRoomMembers] = useState([]);
+
 
   const fetchMultipleUserDetails = async (userIds) => {
     try {
@@ -133,6 +146,9 @@ const Room = () => {
         client.on('user-published', handleUserPublished);
         client.on('user-left', handleUserLeft);
         await joinStream();
+        
+        // Join chat room for instant messaging
+        joinRoom(roomId, 'instant');
       } catch (error) {
         console.error('Error joining room:', error);
       }
@@ -143,6 +159,8 @@ const Room = () => {
     return () => {
       localTracksRef.current.forEach(track => track && track.close());
       client.leave();
+      // Leave chat room when leaving video room
+      leaveRoom();
     };
 
 
@@ -291,7 +309,7 @@ const Room = () => {
     const userContainer = document.getElementById(`user-container-${user.uid}`);
     if (userContainer) userContainer.remove();
 
-    removeMemberList(actualUserId);
+    removeMemberList(user.uid);
     if (userIdInDisplayFrame === `user-container-${user.uid}`) {
       hideDisplayFrame();
     }
@@ -380,7 +398,11 @@ const Room = () => {
   };
 
   const handleChatButtonClick = () => {
-    setActiveChatContainer(prev => !prev);
+    setShowRoomChat(true);
+  };
+
+  const handleCloseRoomChat = () => {
+    setShowRoomChat(false);
   };
 
   const expandVideoFrame = (event) => {
@@ -432,6 +454,13 @@ const Room = () => {
 
   return (
     <>
+      {showRoomChat && (
+        <RoomChat
+          roomId={roomId}
+          messageType="instant"
+          onClose={handleCloseRoomChat}
+        />
+      )}
       <header id="nav">
         <div className="nav--list">
           <button id="members__button" onClick={handleMemberButtonClick}>
@@ -449,18 +478,11 @@ const Room = () => {
         </div>
 
         <div id="nav__links">
-          {/* <button id="chat__button" onClick={handleChatButtonClick}>
+          <button id="chat__button" onClick={handleChatButtonClick}>
             <svg width="24" height="24" xmlns="http://www.w3.org/2000/svg" fillRule="evenodd" fill="#ede0e0" clipRule="evenodd">
               <path d="M24 20h-3v4l-5.333-4h-7.667v-4h2v2h6.333l2.667 2v-2h3v-8.001h-2v-2h4v12.001zm-15.667-6l-5.333 4v-4h-3v-14.001l18 .001v14h-9.667zm-6.333-2h3v2l2.667-2h8.333v-10l-14-.001v10.001z" />
             </svg>
-          </button> */}
-          <a href={`http://localhost:5173/organisation/680f3b01113d4f5045f1f0e9/classes/68133744d40b38055c5c3469`} target='_blank'>
-            <button id="chat__button" >
-              <svg width="24" height="24" xmlns="http://www.w3.org/2000/svg" fillRule="evenodd" fill="#ede0e0" clipRule="evenodd">
-              <path d="M24 20h-3v4l-5.333-4h-7.667v-4h2v2h6.333l2.667 2v-2h3v-8.001h-2v-2h4v12.001zm-15.667-6l-5.333 4v-4h-3v-14.001l18 .001v14h-9.667zm-6.333-2h3v2l2.667-2h8.333v-10l-14-.001v10.001z" />
-              </svg>
-            </button>
-          </a>
+          </button>
 
         </div>
       </header>

@@ -2,6 +2,7 @@ import { useState } from 'react';
 import userContext from './userContext';
 import { data, useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
+import response from "assert";
 
 const UserState = (props) => {
 
@@ -37,11 +38,29 @@ const UserState = (props) => {
                 navigate("/home/profile");
             }
             else {
-                props.showAlert("Invalid credentials", "danger")
+                // Handle specific error cases with appropriate messages
+                if (response.status === 404) {
+                    // User not found - wrong email/username
+                    props.showAlert("Email or username not found", "danger")
+                    toast.error("Email or username not found. Please check your credentials.")
+                } else if (response.status === 401) {
+                    // Invalid credentials - wrong password
+                    props.showAlert("Incorrect password", "danger")
+                    toast.error("Incorrect password. Please try again.")
+                } else if (response.status === 400) {
+                    // Missing fields
+                    props.showAlert(json.message || "Please fill all required fields", "danger")
+                    toast.error(json.message || "Please fill all required fields")
+                } else {
+                    // Generic error
+                    props.showAlert(json.message || "Login failed", "danger")
+                    toast.error(json.message || "Login failed. Please try again.")
+                }
             }
         } catch (error) {
-            console.log("Invalid")
-            props.showAlert("Invalid credentials", "danger")
+            console.log("Network or server error:", error)
+            props.showAlert("Network error. Please try again.", "danger")
+            toast.error("Network error. Please check your connection and try again.")
         }
     }
 
@@ -181,6 +200,58 @@ const UserState = (props) => {
             navigate("/login");
           }
     }
+
+    const updateUser=async (details)=>{
+        try{
+            const response=await fetch(`${host}api/v1/users/update-account`, {
+                method:'POST',
+                headers:{
+                    'Content-Type': 'application/json',
+                    'Authorization':`Bearer ${localStorage.getItem('accessToken')}`
+                },
+                body:JSON.stringify(details)
+            });
+            const json=await response.json();
+            if(response.ok){
+                toast.success("Profile updated successfully");
+                setId(json.data);
+                return true;
+            }
+            else{
+                toast.error(json.message || "Failed to update profile.");
+                return false;
+            }
+        }catch (error){
+            toast.error("An error occurred.");
+            return false;
+        }
+    };
+
+    const changePassword = async (passwords) => {
+        try {
+            const response = await fetch(`${host}api/v1/users/change-password`, {
+                method: 'POST', // This line is the fix. It explicitly sets the request method to POST.
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
+                },
+                body: JSON.stringify(passwords)
+            });
+
+            const json = await response.json();
+
+            if (response.ok) {
+                toast.success("Password changed successfully!");
+                return true;
+            } else {
+                toast.error(json.message || "Failed to change password.");
+                return false;
+            }
+        } catch (error) {
+            toast.error("An error occurred during password change.");
+            return false;
+        }
+    };
     // to be edited by kavya (this will be handled by the backend)
     // const logout = async() => {
     //     localStorage.removeItem('accessToken');
@@ -228,11 +299,9 @@ const UserState = (props) => {
     
     // userDetail();
     return (
-        <userContext.Provider value={{ loginUser, registerUser, userDetail, updateAvatar, checkRefreshToken, logout, id,fetchInvites }}>
+        <userContext.Provider value={{ loginUser, registerUser, userDetail, updateAvatar, checkRefreshToken, logout, id,updateUser,changePassword,fetchInvites }}>
             {props.children}
         </userContext.Provider>
-    )
-
+    );
 }
-
 export default UserState;
