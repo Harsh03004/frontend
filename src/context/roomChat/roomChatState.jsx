@@ -16,8 +16,17 @@ const RoomChatState = (props) => {
     useEffect(() => {
         const accessToken = localStorage.getItem('accessToken');
         if (accessToken && !socket) {
-            // Get user ID from token or use a placeholder
-            const userId = 'user_' + Date.now(); // Temporary user ID
+            // Get user ID from token
+            let userId = 'user_' + Date.now(); // Fallback user ID
+            
+            try {
+                // Decode JWT token to get user ID
+                const tokenPayload = JSON.parse(atob(accessToken.split('.')[1]));
+                userId = tokenPayload.id || tokenPayload.userId || userId;
+            } catch (error) {
+                console.error('Error decoding token:', error);
+            }
+            
             const newSocket = io(host, {
                 query: {
                     userId: userId

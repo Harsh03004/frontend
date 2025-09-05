@@ -1,10 +1,11 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { MessageCircle, Video, User, Building2, ChevronLeft, ChevronRight, Mail } from "lucide-react";
 
 
 const menuItems = [
     { name: "Instant Meet", icon: <Video size={18} /> },
+    { name: "Chat", icon: <MessageCircle size={18} /> },
     { name: "Profile", icon: <User size={18} /> },
     { name: "Organisation", icon: <Building2 size={18} /> },
     { name: "Invites", icon: <Mail size={18} /> },
@@ -62,4 +63,6 @@ const Sidebar = ({ setActivePage }) => {
             </nav>
         </div>
     );
+};
+
 export default Sidebar;
