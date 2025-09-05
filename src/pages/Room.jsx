@@ -2,6 +2,7 @@ import React, { useContext, useEffect, useRef, useState } from 'react';
 import AgoraRTC from 'agora-rtc-sdk-ng';
 import { useNavigate } from 'react-router-dom'
 import userContext from "../context/user/userContext";
+
 import roomChatContext from "../context/roomChat/roomChatContext";
 import RoomChat from "../components/RoomChat";
 import './styles/main.css';
@@ -21,6 +22,8 @@ const Room = () => {
   const checkAndRefreshToken = async () => {
 
     const accessToken = localStorage.getItem("accessToken");
+    const urlParam=new URLSearchParams(window.location.search);
+    const targetRoom = urlParam.get('room') || 'main';
     if (!id) {
       navigate('/lobby'); // Use navigate instead of window.location
       return;
@@ -47,6 +50,10 @@ const Room = () => {
       try {
         const info = await userDetail();
         setUserDetails(info);
+        const saved = localStorage.getItem('display_name');
+        if(!saved && info?.fullname) {
+          localStorage.setItem('display_name', info.fullname);
+        }
       } catch (error) {
         console.error('Error getting user info:', error);
       }

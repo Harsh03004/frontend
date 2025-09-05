@@ -35,18 +35,19 @@ const RoomChat = ({ roomId, messageType = 'instant', organizationId = null, clas
         scrollToBottom();
     }, [messages]);
 
-    // Join appropriate room/chat when component mounts
     useEffect(() => {
-        if (roomId && messageType === 'instant') {
+          if (!isConnected) return;           // wait for socket
+          if (roomId && messageType === 'instant') {
             joinRoom(roomId, messageType);
-        } else if (organizationId && messageType === 'organization') {
+          } else if (organizationId && messageType === 'organization') {
             joinOrganization(organizationId);
             fetchOrganizationMessages(organizationId);
-        } else if (classId && messageType === 'class') {
+          } else if (classId && messageType === 'class') {
             joinClass(classId);
             fetchClassMessages(classId);
-        }
-    }, [roomId, messageType, organizationId, classId]);
+          }
+        // also rerun when isConnected flips true
+        }, [isConnected, roomId, messageType, organizationId, classId]);
 
     const handleSendMessage = async (e) => {
         e.preventDefault();
