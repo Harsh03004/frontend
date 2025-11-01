@@ -7,10 +7,7 @@ ENV NODE_ENV=development
 WORKDIR /usr/src/app
 
 # Install dependencies (include devDependencies for vite)
-RUN --mount=type=bind,source=package.json,target=package.json \
-    --mount=type=bind,source=package-lock.json,target=package-lock.json \
-    --mount=type=cache,target=/root/.npm \
-    npm ci
+RUN npm ci
 
 # Copy source code
 COPY . .
