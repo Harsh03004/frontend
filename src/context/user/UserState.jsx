@@ -13,7 +13,7 @@ const UserState = (props) => {
     const host = import.meta.env.VITE_API_URL;
 
     const loginUser = async (credentials) => {
-        const response = await fetch(`${host}api/v1/users/login`, {
+        const response = await fetch(`${host}/api/v1/users/login`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -65,7 +65,7 @@ const UserState = (props) => {
     }
 
     const registerUser = async (credentials) => {
-        const response = await fetch(`${host}api/v1/users/register`, {
+        const response = await fetch(`${host}/api/v1/users/register`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -89,7 +89,7 @@ const UserState = (props) => {
     }
 
     const userDetail = async () => {
-        const response = await fetch(`${host}api/v1/users/getUserDetail`, {
+        const response = await fetch(`${host}/api/v1/users/getUserDetail`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -126,7 +126,7 @@ const UserState = (props) => {
         // formData.append(data)
         console.log(id)
 
-        const response = await fetch(`${host}api/v1/users/updateAvatar`, {
+        const response = await fetch(`${host}/api/v1/users/updateAvatar`, {
             method: 'POST',
             headers: {
                 'Authorization': `Bearer ${localStorage.getItem('accessToken')}`,
@@ -148,7 +148,7 @@ const UserState = (props) => {
 
     const fetchInvites = async () => {
         try{
-            const response=await fetch(`${host}api/v1/users/invites`,{
+            const response=await fetch(`${host}/api/v1/users/invites`,{
                 mathod:'GET',
                 headers:{
                     'Content-Type':'applicatoin/json',
@@ -169,7 +169,7 @@ const UserState = (props) => {
 
     const checkRefreshToken =  async ()=>{
         try {
-            const response = await fetch(`${host}api/v1/users/refreshToken`, {
+            const response = await fetch(`${host}/api/v1/users/refreshToken`, {
               method: 'POST',
               headers: {
                 'Content-Type': 'application/json'
@@ -203,7 +203,7 @@ const UserState = (props) => {
 
     const updateUser=async (details)=>{
         try{
-            const response=await fetch(`${host}api/v1/users/update-account`, {
+            const response=await fetch(`${host}/api/v1/users/update-account`, {
                 method:'POST',
                 headers:{
                     'Content-Type': 'application/json',
@@ -229,7 +229,7 @@ const UserState = (props) => {
 
     const changePassword = async (passwords) => {
         try {
-            const response = await fetch(`${host}api/v1/users/change-password`, {
+            const response = await fetch(`${host}/api/v1/users/change-password`, {
                 method: 'POST', // This line is the fix. It explicitly sets the request method to POST.
                 headers: {
                     'Content-Type': 'application/json',
@@ -272,7 +272,7 @@ const UserState = (props) => {
       
         try {
           // Call the backend /logout route
-          const response = await fetch(`${host}api/v1/users/logout`, {
+          const response = await fetch(`${host}/api/v1/users/logout`, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
