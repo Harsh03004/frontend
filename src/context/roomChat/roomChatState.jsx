@@ -10,7 +10,7 @@ const RoomChatState = (props) => {
   const [currentRoom, setCurrentRoom] = useState(null);
   const [currentMessageType, setCurrentMessageType] = useState('instant');
 
-  const host = 'http://localhost:3000/';
+  const host = import.meta.env.VITE_API_URL;
 
   // === Initialize socket connection (robust, no nested effects) ===
   useEffect(() => {

@@ -10,7 +10,7 @@ const UserState = (props) => {
 
     const [id, setId] = useState("");
     const [socket, setSocket] = useState(null); 
-    const host = "http://localhost:3000/"
+    const host = import.meta.env.VITE_API_URL;
 
     const loginUser = async (credentials) => {
         const response = await fetch(`${host}api/v1/users/login`, {
@@ -148,7 +148,7 @@ const UserState = (props) => {
 
     const fetchInvites = async () => {
         try{
-            const response=await fetch('{host}api/v1/users/invites',{
+            const response=await fetch(`${host}api/v1/users/invites`,{
                 mathod:'GET',
                 headers:{
                     'Content-Type':'applicatoin/json',

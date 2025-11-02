@@ -7,7 +7,7 @@ const ClassesState = ({ children }) => {
   const [error, setError] = useState(null);
 
 
-  const host = "http://localhost:3000";
+  const host = import.meta.env.VITE_API_URL;
 
   const token = localStorage.getItem("accessToken");
   // Fetch all classes for an organization

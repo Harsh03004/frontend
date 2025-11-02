@@ -6,6 +6,7 @@ const Chat = () => {
   const [selectedUser, setSelectedUser] = useState(null);
   const [users, setUsers] = useState([]);
 
+  const host= import.meta.env.VITE_API_URL;
   useEffect(() => {
     const fetchUsers = async () => {
       const accessToken = localStorage.getItem('accessToken'); // Retrieve accessToken from local storage
@@ -15,7 +16,7 @@ const Chat = () => {
       }
 
       try {
-        const response = await fetch('http://localhost:3000/api/v1/users/getUsers', {
+        const response = await fetch(`${host}/api/v1/users/getUsers`, {
           method: 'GET',
           headers: {
             'Authorization': `Bearer ${accessToken}`

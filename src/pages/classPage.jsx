@@ -20,7 +20,7 @@ const ClassPage = () => {
   const { sendInvite } = useContext(ClassesContext);
   const navigate = useNavigate();
   const senderId = localStorage.getItem("userId"); // Assuming you have the senderId available
-
+  const host =import.meta.env.VITE_API_URL;
   // Scroll to bottom on new message
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -32,7 +32,7 @@ const ClassPage = () => {
   };
 
   useEffect(() => {
-    const socket = io("http://localhost:3000", {
+    const socket = io(`${host}`, {
       withCredentials: true,
     });
 
@@ -57,7 +57,7 @@ const ClassPage = () => {
   // Fetch members and class data
   const fetchClassData = async () => {
     try {
-      const res = await axios.get(`http://localhost:3000/api/v1/users/classes/${classId}/members`, {
+      const res = await axios.get(`${host}/api/v1/users/classes/${classId}/members`, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
         },
@@ -83,7 +83,7 @@ const ClassPage = () => {
   // Fetch existing messages
   const getMessages = async () => {
     try {
-      const res = await fetch(`http://localhost:3000/api/v1/messages/${classId}`, {
+      const res = await fetch(`${host}/api/v1/messages/${classId}`, {
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
@@ -116,7 +116,7 @@ const ClassPage = () => {
       };
 
       // Send HTTP POST request to save message
-      const res = await fetch(`http://localhost:3000/api/v1/messages/${classId}/send`, {
+      const res = await fetch(`${host}/api/v1/messages/${classId}/send`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

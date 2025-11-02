@@ -5,7 +5,7 @@ import toast from 'react-hot-toast';
 
 
 const OrganisationState = (props) => {
-    const host = "http://localhost:3000"; // Replace with your backend URL
+    const host = import.meta.env.VITE_API_URL;
     const [organisations, setOrganisations] = useState([]);
 
     const fetchOrganisations = async () => {

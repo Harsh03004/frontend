@@ -90,13 +90,13 @@ const Room = () => {
   const [userIdInDisplayFrame, setUserIdInDisplayFrame] = useState(null);
   const [roomMembers, setRoomMembers] = useState([]);
 
-
+  const host =import.meta.env.VITE_API_URL;
   const fetchMultipleUserDetails = async (userIds) => {
     try {
       const accessToken = localStorage.getItem("accessToken");
       console.log("Fetching details for user IDs:", userIds);
 
-      const response = await fetch(`http://localhost:3000/api/v1/users/getMultipleUsers`, {
+      const response = await fetch(`${host}/api/v1/users/getMultipleUsers`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

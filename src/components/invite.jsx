@@ -5,11 +5,11 @@ import toast from "react-hot-toast";
 const Invite = () => {
   const [invites, setInvites] = useState([]);
   const [loading, setLoading] = useState(false);
-  const host = "localhost:3000"
+  const host = import.meta.env.VITE_API_URL;
   const fetchInvites = async () => {
     try {
       setLoading(true);
-      const res = await axios.get(`http://localhost:3000/api/v1/users/invites`,{
+      const res = await axios.get(`${host}/api/v1/users/invites`,{
         headers: {
           "Content-Type": "application/json",
             "Authorization": `Bearer ${localStorage.getItem("accessToken")}`,}
@@ -26,7 +26,7 @@ const Invite = () => {
   const handleAccept = async (id) => {
     try {
       await axios.post(
-        `http://localhost:3000/api/v1/users/invites/${id}/accept`,
+        `${host}/api/v1/users/invites/${id}/accept`,
         {}, 
         {
           headers: {
@@ -46,7 +46,7 @@ const Invite = () => {
 
   const handleDecline = async (id) => {
     try {
-      await axios.post(`http://localhost:3000/api/v1/users/invites/${id}/decline`,
+      await axios.post(`${host}/api/v1/users/invites/${id}/decline`,
         {},
         {
           headers: {
